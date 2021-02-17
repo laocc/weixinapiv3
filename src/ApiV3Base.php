@@ -68,7 +68,7 @@ abstract class ApiV3Base
         $message = "{$method}\n{$uri}\n{$time}\n{$nonce}\n{$body}\n";
         openssl_sign($message, $sign, $this->service->certEncrypt, 'sha256WithRSAEncryption');
         $ts = 'WECHATPAY2-SHA256-RSA2048 mchid="%s",nonce_str="%s",timestamp="%d",serial_no="%s",signature="%s"';
-        return sprintf($ts, $mchID, $nonce, $time, $this->service->certKey, base64_encode($sign));
+        return sprintf($ts, $mchID, $nonce, $time, $this->service->certSerial, base64_encode($sign));
     }
 
     public function signCheck(bool $check)

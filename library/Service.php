@@ -12,9 +12,7 @@ class Service
     public $appID;
     public $apiKey;
     public $apiV3Key;
-    public $certKey;
-
-    public $wxCert;//此服务商所有对应的微信证书
+    public $certSerial;
 
     public $certEncrypt;
 
@@ -43,10 +41,9 @@ class Service
         $this->appID = $service['servAppID'];
         $this->apiKey = $service['servKey'];
         $this->apiV3Key = $service['servApiV3Key'];
-        $this->certKey = $service['servCertIndex'];
-//        $this->wxCert = $service['cert'];
+        $this->certSerial = $service['servCertSerial'];
 
-        $cert = _ROOT . "/common/cert/{$this->mchID}/apiclient_key.pem";
+        $cert = _ROOT . "/common/cert/{$this->certSerial}/apiclient_key.pem";
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));
         return $this;
     }
@@ -57,7 +54,7 @@ class Service
             'servID' => $this->servID,
             'mchID' => $this->mchID,
             'appID' => $this->appID,
-            'certKey' => $this->certKey,
+            'certSerial' => $this->certSerial,
         ], 256 | 64 | 128);
     }
 
