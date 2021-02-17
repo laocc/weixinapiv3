@@ -1,0 +1,24 @@
+{
+  "name": "laocc/weixinapiv3",
+  "description": "weixin api v3",
+  "homepage": "https://github.com/laocc/weixinapiv3",
+  "authors": [
+    {
+      "name": "fazo",
+      "email": "fazo@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">7.2",
+    "laocc/http": "*",
+    "ext-curl": "*",
+    "ext-xml": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "esp\\weixinapiv3\\library\\": "library/",
+      "esp\\weixinapiv3\\": "src/"
+    }
+  }
+}
