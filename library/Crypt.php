@@ -6,15 +6,32 @@ namespace esp\weixinapiv3\library;
 
 class Crypt
 {
-    private $wxPubCert;
+    private $serial;
+    private $cert;
+    private $public;
 
     public function __construct(array $wxPubCert)
     {
-        $this->wxPubCert = [
-            'index' => $wxPubCert['certIndex'],
-            'encrypt' => $wxPubCert['certEncrypt'],
-            'algorithm' => $wxPubCert['certAlgorithm'],
-        ];
+        $this->serial = $wxPubCert['certSerial'];
+        $cert = _ROOT . "/common/cert/{$wxPubCert['certSerial']}/cert.pem";
+        $pub = _ROOT . "/common/cert/{$wxPubCert['certSerial']}/public.pem";
+        $this->cert = openssl_get_privatekey(file_get_contents($cert));
+        $this->public = openssl_get_publickey(file_get_contents($pub));
+    }
+
+    public function serial()
+    {
+        return $this->serial;
+    }
+
+    public function public()
+    {
+        return $this->public;
+    }
+
+    public function cert()
+    {
+        return $this->cert;
     }
 
     /**
@@ -52,22 +69,7 @@ class Crypt
      */
     public function encrypt(string $str)
     {
-        $rsa = ($this->wxPubCert['encrypt']);
-        $rsa = chunk_split($rsa, 64, "\n");
-        $rsa = "-----BEGIN PUBLIC KEY-----\n{$rsa}-----END PUBLIC KEY-----";
-        $rsa3 = <<<PUB
------BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC0bIp1HvBiYXqOOHFwQObud1VQ
-XwobDwo7p1Dv9L8Vuw7lwTURfJGnZE8z22YQK68Q3UM16BHmLK17IMfgPWz1xMJx
-Qd9kQBI7JMUhNxkynVKRyl9KBGj8+qrhbQeviGrnENktMlrF6P/Y6xC7rLsezXCo
-dU8Br3wTauq1PJs+9wIDAQAB
------END PUBLIC KEY-----
-PUB;
-        var_dump($rsa);
-
-//        $rsa = file_get_contents(_RUNTIME . '/rsa.pem');
-
-        openssl_public_encrypt($str, $encrypted, $rsa, OPENSSL_PKCS1_OAEP_PADDING);
+        openssl_public_encrypt($str, $encrypted, $this->public, OPENSSL_PKCS1_OAEP_PADDING);
         return base64_encode($encrypted);
     }
 

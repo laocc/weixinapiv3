@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace esp\weixinapiv3\src;
 
-use esp\http\Http;
-use esp\http\Result;
 
-class Media extends Base
+class Media extends ApiV3Base
 {
     /**
      * @param string $filePath
-     * @return Result|string
+     * @return array|string
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter2_1_1.shtml
      */
@@ -29,6 +27,7 @@ class Media extends Base
         if (in_array($ext, ['jpg', 'jpeg', 'png', 'bmp'])) {
             if ($fileSize > 2 * 1024 * 1024) return "上传到微信的图片文件不能超过2M";
             return $this->uploadWx('/v3/merchant/media/upload', $filePath);
+
         } else if (in_array($ext, ['avi', 'wmv', 'mpeg', 'mp4', 'mov', 'mkv', 'flv', 'f4v', 'm4v', 'rmvb'])) {
             if ($fileSize > 5 * 1024 * 1024) return "上传到微信的视频文件不能超过5M";
             return $this->uploadWx('/v3/merchant/media/video_upload', $filePath);
@@ -37,7 +36,12 @@ class Media extends Base
         return "不支持的文件类型：{$ext}";
     }
 
-    private function uploadWx(string $api, string $filePath): Result
+    /**
+     * @param string $api
+     * @param string $filePath
+     * @return mixed|null
+     */
+    private function uploadWx(string $api, string $filePath)
     {
         $basename = \basename($filePath);
         $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $filePath);
@@ -46,11 +50,10 @@ class Media extends Base
         $boundary = sha1(uniqid('', true));
 
         $option = [];
-        $option['encode'] = 'json';
-        $option['agent'] = 'EspHttpClient/cURL';
-        $option['headers'][] = $this->sign('POST', $api, $meta);
-        $option['headers'][] = "Accept: application/json";
-        $option['headers'][] = "Content-Type: multipart/form-data; boundary={$boundary}";
+        $option['type'] = 'upload';
+        $option['headers'] = [];
+        $option['headers']['Authorization'] = $this->sign('POST', $api, $meta);
+        $option['headers']['Content-Type'] = "multipart/form-data; boundary={$boundary}";
 
         $body = '';
         $body .= "--{$boundary}\r\n";
@@ -66,8 +69,7 @@ class Media extends Base
         $body .= fread(fopen($filePath, "rb"), filesize($filePath)) . "\r\n";
         $body .= "--{$boundary}--";
 
-        $http = new Http($option);
-        return $http->data($body)->post($this->api . $api);
+        return $this->requestWx($option, $api, $body);
     }
 
 

@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace esp\weixinapiv3\src;
 
-use esp\http\Http;
-
-class Register extends Base
+class Register extends ApiV3Base
 {
     /**
      * 提交进件
@@ -26,13 +24,7 @@ class Register extends Base
      */
     public function check($regID)
     {
-        $api = "/v3/ecommerce/applyments/{$regID}";
-
-        $option = [];
-        $option['encode'] = 'json';
-        $option['headers'][] = $this->sign('GET', $api);
-
-        $http = new Http($option);
-        return $http->get($this->api . $api);
+        return $this->get("/v3/ecommerce/applyments/{$regID}");
     }
+
 }

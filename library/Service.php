@@ -14,6 +14,8 @@ class Service
     public $apiV3Key;
     public $certKey;
 
+    public $wxCert;//此服务商所有对应的微信证书
+
     public $certEncrypt;
 
     /**
@@ -42,6 +44,7 @@ class Service
         $this->apiKey = $service['servKey'];
         $this->apiV3Key = $service['servApiV3Key'];
         $this->certKey = $service['servCertIndex'];
+//        $this->wxCert = $service['cert'];
 
         $cert = _ROOT . "/common/cert/{$this->mchID}/apiclient_key.pem";
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));
