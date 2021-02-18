@@ -15,7 +15,7 @@ class Certificates extends ApiV3Base
     {
         $Certificates = $this->get("/v3/certificates");
         if (is_string($Certificates)) return $Certificates;
-        foreach ($Certificates['data'] as $cert) {
+        foreach ($Certificates['data'] as &$cert) {
             $cert['cert'] = $this->decryptToString($apiV3Key,
                 $cert['encrypt_certificate']['associated_data'],
                 $cert['encrypt_certificate']['nonce'],
