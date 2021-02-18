@@ -11,7 +11,7 @@ class Pay extends ApiV3Base
     public function jsapi(array $params)
     {
         $data = [];
-        $data['sp_appid'] = $this->service->appID;
+        $data['sp_appid'] = $this->service->miniAppID;
         $data['sp_mchid'] = $this->service->mchID;
 
 //        $data['sub_appid'] = $this->merchant->appID;
