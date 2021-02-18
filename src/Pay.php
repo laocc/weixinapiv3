@@ -32,7 +32,7 @@ class Pay extends ApiV3Base
 
         $data['payer'] = [];
         $data['payer']['sp_openid'] = $params['openid'];
-        $data['payer']['sub_openid'] = 'CNY';
+//        $data['payer']['sub_openid'] = 'CNY';
 
         return $this->post("/v3/pay/partner/transactions/jsapi", $data);
     }
