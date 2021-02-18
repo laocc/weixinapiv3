@@ -19,7 +19,7 @@ class Pay extends ApiV3Base
 
         $data['description'] = $params['subject'];
         $data['out_trade_no'] = $params['id'];
-        $data['time_expire'] = date('YmdTHis+08:00');
+        $data['time_expire'] = date(DATE_RFC3339);
         $data['attach'] = $params['attach'];
         $data['notify_url'] = $params['notify'];
 
