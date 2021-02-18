@@ -22,7 +22,7 @@ class Register extends ApiV3Base
      * @param $regID
      * @return \esp\http\Result
      */
-    public function check($regID)
+    public function query($regID)
     {
         return $this->get("/v3/ecommerce/applyments/{$regID}");
     }
