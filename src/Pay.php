@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace esp\weixinapiv3\src;
 
 
+use function esp\helper\str_rand;
+
 class Pay extends ApiV3Base
 {
     public function jsapi(array $params)
@@ -18,7 +20,7 @@ class Pay extends ApiV3Base
         $data['description'] = $params['subject'];
         $data['out_trade_no'] = $params['id'];
         $data['time_expire'] = date('YmdTHis+08:00');
-        $data['attach'] = mt_rand();
+        $data['attach'] = $params['attach'];
         $data['notify_url'] = $params['notify'];
 
         $data['settle_info'] = [];
