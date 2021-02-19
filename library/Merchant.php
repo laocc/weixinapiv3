@@ -30,7 +30,7 @@ class Merchant
      */
     public function reMerchant(array $mchOrShop)
     {
-        if (!isset($mchOrShop['shopID'])) throw new EspError("传入数据需要含有merchantModel的数据结构");
+        if (!isset($mchOrShop['shopID'])) throw new EspError("传入数据需要含有shopModel的数据结构");
 
         $this->servID = $mchOrShop['shopServID'];
         $this->mchID = $mchOrShop['shopWxMchID'];

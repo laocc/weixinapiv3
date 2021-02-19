@@ -77,8 +77,9 @@ class Pay extends ApiV3Base
             $resource['associated_data'],
             $resource['nonce'],
             $resource['ciphertext']);
+        if ($value === false) return "数据解密失败";
 
-        return $value;
+        return json_decode($value, true);
     }
 
 
