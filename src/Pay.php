@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace esp\weixinapiv3\src;
 
 
+use esp\library\request\Post;
 use function esp\helper\str_rand;
 
 class Pay extends ApiV3Base
@@ -51,16 +52,34 @@ class Pay extends ApiV3Base
         return $values;
     }
 
-
-    private function paySign(string $method, string $uri, string $body = '')
+    public function notify($data)
     {
-        $method = strtoupper($method);
-        $mchID = $this->service->mchID;
-        $nonce = sha1(uniqid('', true));
-        $time = time();
-        $message = "{$this->service->miniAppID}\n{$uri}\n{$time}\n{$nonce}\n{$body}\n";
-        openssl_sign($message, $sign, $this->service->certEncrypt, 'sha256WithRSAEncryption');
-        $ts = 'WECHATPAY2-SHA256-RSA2048 mchid="%s",nonce_str="%s",timestamp="%d",serial_no="%s",signature="%s"';
-        return sprintf($ts, $mchID, $nonce, $time, $this->service->certSerial, base64_encode($sign));
+        $serial = getenv('HTTP_WECHATPAY_SERIAL');
+        $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
+        $nonce = getenv('HTTP_WECHATPAY_NONCE');
+        $sign = getenv('HTTP_WECHATPAY_SIGNATURE');
+        $json = file_get_contents('php://input');
+
+        $message = "{$time}\n{$nonce}\n{$json}\n";
+        if (!is_null($this->crypt)) {
+            $certEncrypt = $this->crypt->public();
+        } else {
+            $cert = _ROOT . "/common/cert/{$serial}/public.pem";
+            $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
+        }
+        $signature = \base64_decode($sign);
+        $chk = \openssl_verify($message, $signature, $certEncrypt, 'sha256WithRSAEncryption');
+        if ($chk !== 1) return "wxAPIv3 Sign Error";
+
+        $resource = $data['resource'];
+
+        $value = $this->decryptToString($this->service->apiV3Key,
+            $resource['associated_data'],
+            $resource['nonce'],
+            $resource['ciphertext']);
+
+        return $value;
     }
+
+
 }

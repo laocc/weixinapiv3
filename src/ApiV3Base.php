@@ -149,4 +149,31 @@ abstract class ApiV3Base
         return $request->data();
     }
 
+    /**
+     * 数据解密
+     *
+     * 如果是获取证书，解密后，要再次导出公钥：
+     * openssl x509 -in cert.pem -pubkey -noout > public.pem
+     *
+     * @param $aesKey
+     * @param $associatedData
+     * @param $nonceStr
+     * @param $ciphertext
+     * @return false|string
+     *
+     */
+    protected function decryptToString($aesKey, $associatedData, $nonceStr, $ciphertext)
+    {
+        $ciphertext = \base64_decode($ciphertext);
+
+        return \openssl_decrypt(substr($ciphertext, 0, -16),
+            'aes-256-gcm',
+            $aesKey,
+            \OPENSSL_RAW_DATA,
+            $nonceStr,
+            substr($ciphertext, -16),
+            $associatedData);
+    }
+
+
 }
