@@ -64,11 +64,10 @@ class Pay extends ApiV3Base
         if (!is_null($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
-            $cert = _ROOT . "/common/cert/{$serial}/public.pem";
+            $cert = _CERT . "/{$serial}/public.pem";
             $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
         }
-        $signature = \base64_decode($sign);
-        $chk = \openssl_verify($message, $signature, $certEncrypt, 'sha256WithRSAEncryption');
+        $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
         if ($chk !== 1) return "wxAPIv3 Sign Error";
 
         $resource = $data['resource'];

@@ -47,7 +47,7 @@ class Service
         $this->apiV3Key = $service['servApiV3Key'];
         $this->certSerial = $service['servCertSerial'];
 
-        $cert = _ROOT . "/common/cert/{$this->certSerial}/apiclient_key.pem";
+        $cert = _CERT . "/{$this->certSerial}/apiclient_key.pem";
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));
         return $this;
     }

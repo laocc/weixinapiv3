@@ -135,7 +135,7 @@ abstract class ApiV3Base
         $header = $request->header();
         $json = $request->html();
 
-        $cert = _ROOT . "/common/cert/{$header['WECHATPAY-SERIAL']}/public.pem";
+        $cert = _CERT . "/{$header['WECHATPAY-SERIAL']}/public.pem";
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
         if (!is_null($this->crypt)) {
             $certEncrypt = $this->crypt->public();

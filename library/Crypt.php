@@ -13,8 +13,8 @@ class Crypt
     public function __construct(array $wxPubCert)
     {
         $this->serial = $wxPubCert['certSerial'];
-        $cert = _ROOT . "/common/cert/{$wxPubCert['certSerial']}/cert.pem";
-        $pub = _ROOT . "/common/cert/{$wxPubCert['certSerial']}/public.pem";
+        $cert = _CERT . "/{$wxPubCert['certSerial']}/cert.pem";
+        $pub = _CERT . "/{$wxPubCert['certSerial']}/public.pem";
         $this->cert = openssl_get_privatekey(file_get_contents($cert));
         $this->public = openssl_get_publickey(file_get_contents($pub));
     }
