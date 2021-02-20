@@ -32,10 +32,10 @@ class Register extends ApiV3Base
         if ($data['sign_url'] ?? '') $upAPY['sign_url'] = $data['sign_url'];
         if ($data['legal_validation_url'] ?? '') $upAPY['legal_url'] = $data['legal_validation_url'];
         if ($data['account_validation'] ?? '') {
-            $av=$data['account_validation'];
+            $av = $data['account_validation'];
             $upAPY['validation'] = [];
             $upAPY['validation'][] = "汇款账户：" . $this->decryptString($av['account_name']);
-            if ($upAPY['validation']['account_no']) {
+            if ($av['account_no']) {
                 $upAPY['validation'][] = "汇款账号：" . $this->decryptString($av['account_no']);
             }
             $upAPY['validation'][] = "汇款金额：" . rnd($av['pay_amount'] / 100) . '元';
