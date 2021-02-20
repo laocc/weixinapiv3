@@ -3,12 +3,15 @@ declare(strict_types=1);
 
 namespace esp\weixinapiv3\src;
 
-
-use esp\library\request\Post;
 use function esp\helper\str_rand;
 
 class Pay extends ApiV3Base
 {
+    /**
+     * 发起公众号、小程序支付
+     * @param array $params
+     * @return array|string
+     */
     public function jsapi(array $params)
     {
         $time = time();
@@ -52,6 +55,61 @@ class Pay extends ApiV3Base
         return $values;
     }
 
+    /**
+     * 合单支付
+     * @param array $order
+     * @return array|string
+     */
+    public function jsapi_combine(array $order, string $notify)
+    {
+        $time = time();
+        $data = [];
+        $data['combine_appid'] = $this->service->miniAppID;
+        $data['combine_mchid'] = $this->service->mchID;
+        $data['combine_out_trade_no'] = $order['orderPlatNumber'];
+        $data['combine_payer_info'] = ['openid' => $order['orderOpenID']];
+        $data['time_start'] = date(DATE_RFC3339, $time);
+        $data['time_expire'] = date(DATE_RFC3339, $time + 86400);
+        $data['notify_url'] = $notify;
+
+        $data['sub_orders'] = [];
+        foreach ($order['sub_order'] as $sub) {
+            $ord = [];
+            $ord['mchid'] = $this->service->mchID;
+            $ord['sub_mchid'] = $sub['subMchID'];
+            $ord['attach'] = str_rand();
+            $ord['out_trade_no'] = $sub['subNumber'];
+            $ord['description'] = $sub['subDescription'];
+            $ord['amount'] = [];
+            $ord['amount']['currency'] = 'CNY';
+            $ord['amount']['total_amount'] = $sub['subAmount'];
+            $ord['settle_info'] = [];
+            $ord['settle_info']['profit_sharing'] = true;
+            $ord['settle_info']['subsidy_amount'] = 0;
+            $data['sub_orders'][] = $ord;
+        }
+
+        $unified = $this->post("/v3/combine-transactions/jsapi", $data);
+        if (is_string($unified)) return $unified;
+
+        $values = array();
+        $values['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
+        $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
+        $values['package'] = "prepay_id={$unified['prepay_id']}";
+        $values['signType'] = 'RSA';
+
+        $message = "{$this->service->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        openssl_sign($message, $sign, $this->service->certEncrypt, 'sha256WithRSAEncryption');
+        $values['paySign'] = base64_encode($sign);//生成签名
+
+        return $values;
+    }
+
+    /**
+     * 受理通知数据，验签，并解密
+     * @param $data
+     * @return mixed|string
+     */
     public function notify($data)
     {
         $serial = getenv('HTTP_WECHATPAY_SERIAL');
