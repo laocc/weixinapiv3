@@ -52,7 +52,7 @@ class Register extends ApiV3Base
         if ($data['audit_detail'] ?? '') $upAPY['audit'] = $data['audit_detail'];
 
         if ($data['sub_mchid'] ?? '') $upAPY['mchid'] = $data['sub_mchid'];
-
+        $upAPY['desc'] = $data['applyment_state_desc'];
         return $upAPY;
     }
 
