@@ -46,7 +46,7 @@ class Register extends ApiV3Base
             $upAPY['validation'][] = "收款账户：{$av['destination_account_name']}";
             $upAPY['validation'][] = "收款账号：{$av['destination_account_number']}";
             $upAPY['validation'][] = "截止时间：{$av['deadline']}";
-            $upAPY['validation'] = implode("；\n", $upAPY['validation']);
+            $upAPY['validation'] = implode("\n", $upAPY['validation']);
         }
 
         if ($data['audit_detail'] ?? '') $upAPY['audit'] = $data['audit_detail'];
