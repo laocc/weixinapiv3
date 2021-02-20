@@ -32,19 +32,20 @@ class Register extends ApiV3Base
         if ($data['sign_url'] ?? '') $upAPY['sign_url'] = $data['sign_url'];
         if ($data['legal_validation_url'] ?? '') $upAPY['legal_url'] = $data['legal_validation_url'];
         if ($data['account_validation'] ?? '') {
+            $av=$data['account_validation'];
             $upAPY['validation'] = [];
-            $upAPY['validation'][] = "汇款账户：" . $this->decryptString($upAPY['validation']['account_name']);
+            $upAPY['validation'][] = "汇款账户：" . $this->decryptString($av['account_name']);
             if ($upAPY['validation']['account_no']) {
-                $upAPY['validation'][] = "汇款账号：" . $this->decryptString($upAPY['validation']['account_no']);
+                $upAPY['validation'][] = "汇款账号：" . $this->decryptString($av['account_no']);
             }
-            $upAPY['validation'][] = "汇款金额：" . rnd($upAPY['validation']['pay_amount'] / 100) . '元';
-            $upAPY['validation'][] = "汇款留言：{$upAPY['validation']['remark']}";
+            $upAPY['validation'][] = "汇款金额：" . rnd($av['pay_amount'] / 100) . '元';
+            $upAPY['validation'][] = "汇款留言：{$av['remark']}";
 
-            $upAPY['validation'][] = "收款银行：{$upAPY['validation']['destination_account_bank']}";
-            $upAPY['validation'][] = "收款城市：{$upAPY['validation']['city']}";
-            $upAPY['validation'][] = "收款账户：{$upAPY['validation']['destination_account_name']}";
-            $upAPY['validation'][] = "收款账号：{$upAPY['validation']['destination_account_number']}";
-            $upAPY['validation'][] = "截止时间：{$upAPY['validation']['deadline']}";
+            $upAPY['validation'][] = "收款银行：{$av['destination_account_bank']}";
+            $upAPY['validation'][] = "收款城市：{$av['city']}";
+            $upAPY['validation'][] = "收款账户：{$av['destination_account_name']}";
+            $upAPY['validation'][] = "收款账号：{$av['destination_account_number']}";
+            $upAPY['validation'][] = "截止时间：{$av['deadline']}";
             $upAPY['validation'] = implode("；\n", $upAPY['validation']);
         }
 
