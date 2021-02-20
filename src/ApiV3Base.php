@@ -151,7 +151,7 @@ abstract class ApiV3Base
     }
 
     /**
-     * 数据解密
+     * 数据解密，
      *
      * 如果是获取证书，解密后，要再次导出公钥：
      * openssl x509 -in cert.pem -pubkey -noout > public.pem
@@ -176,5 +176,15 @@ abstract class ApiV3Base
             $associatedData);
     }
 
+    /**
+     * 用服务商私钥解密
+     * @param string $input
+     * @return mixed
+     */
+    public function decryptString(string $input)
+    {
+        openssl_private_decrypt(base64_decode($input), $out, $this->service->certEncrypt, \OPENSSL_PKCS1_OAEP_PADDING);
+        return $out;
+    }
 
 }

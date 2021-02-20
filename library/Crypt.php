@@ -34,7 +34,10 @@ class Crypt
         return $this->cert;
     }
 
+
+
     /**
+     * 用腾讯的公钥加密敏感信息
      * 加密数组中值第一位是*的数据
      * 支持三维数组
      * @param array $data
