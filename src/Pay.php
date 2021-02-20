@@ -60,6 +60,11 @@ class Pay extends ApiV3Base
      * @param array $order
      * @return array|string
      */
+    /**
+     * @param array $order
+     * @param string $notify
+     * @return array|string
+     */
     public function jsapi_combine(array $order, string $notify)
     {
         $time = time();

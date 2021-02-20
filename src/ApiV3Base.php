@@ -134,7 +134,7 @@ abstract class ApiV3Base
 
         $header = $request->header();
         $json = $request->html();
-        print_r($request);
+//        print_r($request);
 
         $cert = _CERT . "/{$header['WECHATPAY-SERIAL']}/public.pem";
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
