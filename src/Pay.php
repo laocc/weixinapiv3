@@ -115,7 +115,7 @@ class Pay extends ApiV3Base
      * @param $data
      * @return mixed|string
      */
-    public function notify($data)
+    public function notifyDecrypt($data)
     {
         $serial = getenv('HTTP_WECHATPAY_SERIAL');
         $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
