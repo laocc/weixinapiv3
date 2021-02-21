@@ -24,17 +24,15 @@ class Merchant
     }
 
     /**
-     * @param array $service
+     * @param array $mchOrShop
      * @return $this
      * @throws EspError
      */
     public function reMerchant(array $mchOrShop)
     {
-        if (!isset($mchOrShop['shopID'])) throw new EspError("传入数据需要含有shopModel的数据结构");
-
-        $this->servID = $mchOrShop['shopServID'];
-        $this->mchID = $mchOrShop['shopWxMchID'];
-        $this->appID = $mchOrShop['shopAppID'];
+        $this->servID = $mchOrShop['servID'];
+        $this->mchID = $mchOrShop['mchID'];
+        $this->appID = $mchOrShop['appID'];
         return $this;
     }
 

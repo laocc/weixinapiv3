@@ -23,10 +23,9 @@ abstract class ApiV3Base
 
     private $signCheck = true;
 
-    public function __construct(Service $service, Merchant $merchant = null)
+    public function __construct(Service $service)
     {
         $this->service = $service;
-        $this->merchant = $merchant;
         $this->_debug = Debug::class();
     }
 
@@ -39,12 +38,6 @@ abstract class ApiV3Base
     public function setService(Service $service)
     {
         $this->service = $service;
-        return $this;
-    }
-
-    public function setMerchant(Merchant $merchant)
-    {
-        $this->merchant = $merchant;
         return $this;
     }
 

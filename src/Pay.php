@@ -19,8 +19,8 @@ class Pay extends ApiV3Base
         $data['sp_appid'] = $this->service->miniAppID;
         $data['sp_mchid'] = $this->service->mchID;
 
-//        $data['sub_appid'] = $this->merchant->appID;
-        $data['sub_mchid'] = $this->merchant->mchID;
+//        $data['sub_appid'] = $params['appID'];
+        $data['sub_mchid'] = $params['mchID'];
 
         $data['description'] = $params['subject'];
         $data['out_trade_no'] = $params['id'];
