@@ -110,39 +110,5 @@ class Pay extends ApiV3Base
         return $values;
     }
 
-    /**
-     * 受理通知数据，验签，并解密
-     * @param $data
-     * @return mixed|string
-     */
-    public function notifyDecrypt($data)
-    {
-        $serial = getenv('HTTP_WECHATPAY_SERIAL');
-        $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
-        $nonce = getenv('HTTP_WECHATPAY_NONCE');
-        $sign = getenv('HTTP_WECHATPAY_SIGNATURE');
-        $json = file_get_contents('php://input');
-
-        $message = "{$time}\n{$nonce}\n{$json}\n";
-        if (!is_null($this->crypt)) {
-            $certEncrypt = $this->crypt->public();
-        } else {
-            $cert = _CERT . "/{$serial}/public.pem";
-            $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
-        }
-        $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
-        if ($chk !== 1) return "wxAPIv3 Sign Error";
-
-        $resource = $data['resource'];
-
-        $value = $this->decryptToString($this->service->apiV3Key,
-            $resource['associated_data'],
-            $resource['nonce'],
-            $resource['ciphertext']);
-        if ($value === false) return "数据解密失败";
-
-        return json_decode($value, true);
-    }
-
 
 }

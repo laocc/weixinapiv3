@@ -6,7 +6,6 @@ namespace esp\weixinapiv3\src;
 use esp\core\Debug;
 use esp\http\Http;
 use esp\weixinapiv3\library\Crypt;
-use esp\weixinapiv3\library\Merchant;
 use esp\weixinapiv3\library\Service;
 
 
@@ -160,6 +159,12 @@ abstract class ApiV3Base
     {
         $ciphertext = \base64_decode($ciphertext);
 
+        /**
+         * 微信第1版Api中是这样解密的：
+         * $xml = openssl_decrypt(base64_decode($code), "AES-256-ECB", md5($key), OPENSSL_RAW_DATA);
+         */
+
+
         return \openssl_decrypt(substr($ciphertext, 0, -16),
             'aes-256-gcm',
             $aesKey,
@@ -179,5 +184,41 @@ abstract class ApiV3Base
         openssl_private_decrypt(base64_decode($input), $out, $this->service->certEncrypt, \OPENSSL_PKCS1_OAEP_PADDING);
         return $out;
     }
+
+
+    /**
+     * 受理通知数据，验签，并解密
+     * @param $data
+     * @return mixed|string
+     */
+    public function notifyDecrypt($data)
+    {
+        $serial = getenv('HTTP_WECHATPAY_SERIAL');
+        $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
+        $nonce = getenv('HTTP_WECHATPAY_NONCE');
+        $sign = getenv('HTTP_WECHATPAY_SIGNATURE');
+        $json = file_get_contents('php://input');
+
+        $message = "{$time}\n{$nonce}\n{$json}\n";
+        if (!is_null($this->crypt)) {
+            $certEncrypt = $this->crypt->public();
+        } else {
+            $cert = _CERT . "/{$serial}/public.pem";
+            $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
+        }
+        $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
+        if ($chk !== 1) return "wxAPIv3 Sign Error";
+
+        $resource = $data['resource'];
+
+        $value = $this->decryptToString($this->service->apiV3Key,
+            $resource['associated_data'],
+            $resource['nonce'],
+            $resource['ciphertext']);
+        if ($value === false) return "数据解密失败";
+
+        return json_decode($value, true);
+    }
+
 
 }
