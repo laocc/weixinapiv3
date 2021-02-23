@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weixinapiv3\src;
+namespace esp\weiPay;
 
 use esp\core\Debug;
 use esp\http\Http;
-use esp\weixinapiv3\library\Crypt;
-use esp\weixinapiv3\library\Service;
+use esp\weiPay\library\Crypt;
+use esp\weiPay\library\Service;
 
 
 abstract class ApiV3Base

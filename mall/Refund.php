@@ -1,7 +1,8 @@
 <?php
 
-namespace esp\weixinapiv3\src;
+namespace esp\weiPay\mall;
 
+use esp\weiPay\ApiV3Base;
 
 class Refund extends ApiV3Base
 {

@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weixinapiv3\src;
+namespace esp\weiPay\mall;
 
+use esp\weiPay\ApiV3Base;
 use function esp\helper\str_rand;
 
 class Pay extends ApiV3Base

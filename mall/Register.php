@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weixinapiv3\src;
+namespace esp\weiPay\mall;
 
 use function esp\helper\rnd;
+use esp\weiPay\ApiV3Base;
 
 class Register extends ApiV3Base
 {

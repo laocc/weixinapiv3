@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weixinapiv3\src;
+namespace esp\weiPay\common;
+use esp\weiPay\ApiV3Base;
 
 
 class Certificates extends ApiV3Base

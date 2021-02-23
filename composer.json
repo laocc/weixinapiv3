@@ -17,8 +17,7 @@
   },
   "autoload": {
     "psr-4": {
-      "esp\\weixinapiv3\\library\\": "library/",
-      "esp\\weixinapiv3\\": "src/"
+      "esp\\weiPay\\": "/"
     }
   }
 }

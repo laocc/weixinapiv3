@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weixinapiv3\library;
+namespace esp\weiPay\library;
 
 
 class Crypt
