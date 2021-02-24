@@ -6,28 +6,37 @@ use esp\weiPay\ApiV3Base;
 
 class Refund extends ApiV3Base
 {
-    public function apply(array $params)
+    public function apply(array $refDataAll)
     {
-        $data = [];
-        $data['sp_mchid'] = $this->service->mchID;
-        $data['sub_mchid'] = $params['mchID'];
-        $data['transaction_id'] = $params['transaction'];
-        $data['out_trade_no'] = $params['number'];
-        $data['reason'] = $params['reason'];
-        $data['notify_url'] = $params['notify'];
-        $data['amount'] = [];
-        $data['amount']['refund'] = $params['fee'];
-        $data['amount']['total'] = $params['total'];
-        $data['amount']['currency'] = 'CNY';
+        $value = [];
 
-        $unified = $this->post("/v3/ecommerce/refunds/apply", $data);
-        if (is_string($unified)) return $unified;
+        foreach ($refDataAll as $ref) {
+            $data = [];
+            $data['sp_mchid'] = $this->service->mchID;
+            $data['sub_mchid'] = $ref['mchID'];
+            $data['transaction_id'] = $ref['transaction'];
+            $data['out_trade_no'] = $ref['number'];
+            $data['reason'] = $ref['reason'];
+            $data['notify_url'] = $ref['notify'];
+            $data['amount'] = [];
+            $data['amount']['refund'] = $ref['amount'];
+            $data['amount']['total'] = $ref['total'];
+            $data['amount']['currency'] = 'CNY';
 
-        return [
-            'refund_id' => $unified['refund_id'],
-            'number' => $unified['out_refund_no'],
-            'time' => strtotime($unified['create_time']),
-            'fee' => intval($unified['amount']['payer_refund']),
-        ];
+            $unified = $this->post("/v3/ecommerce/refunds/apply", $data);
+            if (is_string($unified)) {
+                $value[$ref['mchID']] = $unified;
+
+            } else {
+                $value[$ref['mchID']] = [
+                    'refund_id' => $unified['refund_id'],
+                    'number' => $unified['out_refund_no'],
+                    'time' => strtotime($unified['create_time']),
+                    'amount' => intval($unified['amount']['payer_refund']),
+                ];
+            }
+        }
+
+        return $value;
     }
 }
