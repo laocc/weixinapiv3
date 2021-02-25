@@ -16,7 +16,7 @@ class Refund extends ApiV3Base
             $data['sp_appid'] = $this->service->mppAppID;
             $data['sub_mchid'] = $ref['mchID'];
             $data['transaction_id'] = $ref['transaction'];
-            $data['out_trade_no'] = $ref['number'];
+            $data['out_refund_no'] = $ref['number'];
             $data['reason'] = $ref['reason'];
             $data['notify_url'] = $ref['notify'];
             $data['amount'] = [];
