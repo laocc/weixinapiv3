@@ -40,7 +40,6 @@ class Service
 
         $this->servID = $service['servID'];
         $this->mchID = $service['servMchID'];
-        $this->appID = $service['servAppID'];
         $this->miniAppID = $service['servMiniAppID'];
         $this->mppAppID = $service['servMppAppID'];
         $this->apiKey = $service['servKey'];
@@ -57,7 +56,8 @@ class Service
         return json_encode([
             'servID' => $this->servID,
             'mchID' => $this->mchID,
-            'appID' => $this->appID,
+            'miniAppID' => $this->miniAppID,
+            'mppAppID' => $this->mppAppID,
             'certSerial' => $this->certSerial,
         ], 256 | 64 | 128);
     }
