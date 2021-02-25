@@ -22,11 +22,12 @@ class Register extends ApiV3Base
     /**
      * 查询进件审核状态
      * @param $regID
-     * @return array
+     * @return array|string
      */
     public function query($regID)
     {
         $data = $this->get("/v3/ecommerce/applyments/{$regID}");
+        if (is_string($data)) return $data;
 
         $upAPY = [];
         if ($data['applyment_state'] ?? '') $upAPY['state'] = $data['applyment_state'];
