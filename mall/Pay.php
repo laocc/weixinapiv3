@@ -118,12 +118,12 @@ class Pay extends ApiV3Base
         if (is_string($data)) return $data;
         $values = [];
 
-        foreach ($data as $ord) {
+        foreach ($data['sub_orders'] as $ord) {
             $values[] = [
                 'number' => $ord['out_trade_no'],
-                'transaction' => $ord['transaction_id'],
                 'state' => $ord['trade_state'],
-                'time' => strtotime($ord['success_time']),
+                'transaction' => $ord['transaction_id'] ?? '',
+                'time' => strtotime($ord['success_time'] ?? ''),
             ];
         }
 
