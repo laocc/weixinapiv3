@@ -82,7 +82,7 @@ class Pay extends ApiV3Base
         foreach ($order['sub_order'] as $sub) {
             $ord = [];
             $ord['mchid'] = $this->service->mchID;
-            $ord['sub_mchid'] = $sub['subMchID'];
+            $ord['sub_mchid'] = $sub['subWxMchID'];
             $ord['attach'] = str_rand();
             $ord['out_trade_no'] = $sub['subNumber'];
             $ord['description'] = $sub['subDescription'];

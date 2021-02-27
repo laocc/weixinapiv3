@@ -47,6 +47,11 @@ class Bill extends ApiV3Base
 
     public function query(array $param)
     {
+        /**
+         * {"sub_mchid":"1606627885",
+         * "transaction_id":"4300100953202102279161729706",
+         * "out_order_no":"2102271807482048568531"}
+         */
         $data = [];
         $data['sub_mchid'] = $param['mchid'];
         $data['transaction_id'] = $param['transaction'];
