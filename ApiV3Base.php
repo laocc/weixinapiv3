@@ -47,7 +47,9 @@ abstract class ApiV3Base
     }
 
     /**
-     * @param $uri
+     * @param string $method
+     * @param string $uri
+     * @param string $body
      * @return string
      * https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay4_0.shtml
      */
@@ -69,8 +71,9 @@ abstract class ApiV3Base
         return $this;
     }
 
-    protected function get(string $api)
+    protected function get(string $api, array $params = null)
     {
+        if ($params) $api = $api . '?' . http_build_query($params);
         $option = [];
         $option['type'] = 'get';
         $option['headers'] = [];

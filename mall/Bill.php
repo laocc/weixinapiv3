@@ -57,7 +57,7 @@ class Bill extends ApiV3Base
         $data['transaction_id'] = $param['transaction'];
         $data['out_order_no'] = $param['number'];
 
-        $unified = $this->post("/v3/ecommerce/profitsharing/orders", $data);
+        $unified = $this->get("/v3/ecommerce/profitsharing/orders", $data);
         if (is_string($unified)) return $unified;
         return true;
     }
