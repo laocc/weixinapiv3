@@ -112,4 +112,23 @@ class Pay extends ApiV3Base
     }
 
 
+    public function query(string $ordNumber)
+    {
+        $data = $this->get("/v3/combine-transactions/out-trade-no/{{$ordNumber}}");
+        if (is_string($data)) return $data;
+        $values = [];
+
+        foreach ($data as $ord) {
+            $values[] = [
+                'number' => $ord['out_trade_no'],
+                'transaction' => $ord['transaction_id'],
+                'state' => $ord['trade_state'],
+                'time' => strtotime($ord['success_time']),
+            ];
+        }
+
+        return $values;
+    }
+
+
 }
