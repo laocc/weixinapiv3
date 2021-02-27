@@ -8,7 +8,7 @@ use esp\weiPay\ApiV3Base;
 class Bill extends ApiV3Base
 {
 
-    public function bind($param)
+    public function bind(array $param)
     {
         $data = [];
         $data['appid'] = $this->service->miniAppID;
@@ -29,14 +29,6 @@ class Bill extends ApiV3Base
      */
     public function create(array $billOrder)
     {
-        /**
-         * (
-         * [order_id] => 30002102162021022708255143656
-         * [out_order_no] => 2102271613399447597400
-         * [sub_mchid] => 1606823507
-         * [transaction_id] => 4313500652202102274472653205
-         * )
-         */
         $value = [];
         foreach ($billOrder as $i => $bill) {
             $data = [];
@@ -51,5 +43,19 @@ class Bill extends ApiV3Base
         }
         return $value;
     }
+
+
+    public function query(array $param)
+    {
+        $data = [];
+        $data['sub_mchid'] = $param['mchid'];
+        $data['transaction_id'] = $param['transaction'];
+        $data['out_order_no'] = $param['number'];
+
+        $unified = $this->post("/v3/ecommerce/profitsharing/orders", $data);
+        if (is_string($unified)) return $unified;
+        return true;
+    }
+
 
 }
