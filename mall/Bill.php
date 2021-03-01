@@ -31,15 +31,27 @@ class Bill extends ApiV3Base
     {
         $value = [];
         foreach ($billOrder as $i => $bill) {
-            $data = [];
-            $data['appid'] = $this->service->miniAppID;
-            $data['sub_mchid'] = $bill['mchID'];
-            $data['transaction_id'] = $bill['transaction'];
-            $data['out_order_no'] = $bill['number'];
-            $data['finish'] = $bill['finish'];
-            $data['receivers'] = $bill['receivers'];
-            $unified = $this->post("/v3/ecommerce/profitsharing/orders", $data);
-            $value[$bill['number']] = $unified;
+            if (empty($bill['receivers'])) {
+                //无分账方，结束分账
+                $data = [];
+                $data['sub_mchid'] = $bill['mchID'];
+                $data['transaction_id'] = $bill['transaction'];
+                $data['out_order_no'] = $bill['number'];
+                $data['description'] = $bill['description'];
+                $unified = $this->post("/v3/ecommerce/profitsharing/finish-order", $data);
+                $value[$bill['number']] = $unified;
+
+            } else {
+                $data = [];
+                $data['appid'] = $this->service->miniAppID;
+                $data['sub_mchid'] = $bill['mchID'];
+                $data['transaction_id'] = $bill['transaction'];
+                $data['out_order_no'] = $bill['number'];
+                $data['finish'] = $bill['finish'];
+                $data['receivers'] = $bill['receivers'];
+                $unified = $this->post("/v3/ecommerce/profitsharing/orders", $data);
+                $value[$bill['number']] = $unified;
+            }
         }
         return $value;
     }
