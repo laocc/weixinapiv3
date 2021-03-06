@@ -7,7 +7,6 @@ use esp\error\EspError;
 
 class Service
 {
-    public $servID;
     public $mchID;
     public $appID;
     public $miniAppID;
@@ -30,21 +29,20 @@ class Service
     }
 
     /**
-     * @param array $service
+     * @param array $svConf
      * @return $this
      * @throws EspError
      */
-    public function reService(array $service)
+    public function reService(array $svConf)
     {
-        if (!isset($service['servID'])) throw new EspError("传入数据需要含有serviceModel的数据结构");
+        if (!isset($svConf['mchID'])) throw new EspError("传入数据需要含有serviceModel的数据结构");
 
-        $this->servID = $service['servID'];
-        $this->mchID = $service['servMchID'];
-        $this->miniAppID = $service['servMiniAppID'];
-        $this->mppAppID = $service['servMppAppID'];
-        $this->apiKey = $service['servKey'];
-        $this->apiV3Key = $service['servApiV3Key'];
-        $this->certSerial = $service['servCertSerial'];
+        $this->mchID = $svConf['mchID'];
+        $this->miniAppID = $svConf['miniAppID'];
+        $this->mppAppID = $svConf['mppAppID'];
+        $this->apiKey = $svConf['apiKey'];
+        $this->apiV3Key = $svConf['v3Key'];
+        $this->certSerial = $svConf['certSerial'];
 
         $cert = _CERT . "/{$this->certSerial}/apiclient_key.pem";
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));
@@ -54,7 +52,6 @@ class Service
     public function __toString()
     {
         return json_encode([
-            'servID' => $this->servID,
             'mchID' => $this->mchID,
             'miniAppID' => $this->miniAppID,
             'mppAppID' => $this->mppAppID,

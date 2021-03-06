@@ -8,7 +8,6 @@ use esp\error\EspError;
 
 class Merchant
 {
-    public $servID;
     public $mchID;
     public $appID;
 
@@ -24,22 +23,20 @@ class Merchant
     }
 
     /**
-     * @param array $mchOrShop
+     * @param array $mch
      * @return $this
      * @throws EspError
      */
-    public function reMerchant(array $mchOrShop)
+    public function reMerchant(array $mch)
     {
-        $this->servID = $mchOrShop['servID'];
-        $this->mchID = $mchOrShop['mchID'];
-        $this->appID = $mchOrShop['appID'];
+        $this->mchID = $mch['mchID'];
+        $this->appID = $mch['appID'];
         return $this;
     }
 
     public function __toString()
     {
         return json_encode([
-            'servID' => $this->servID,
             'mchID' => $this->mchID,
             'appID' => $this->appID,
         ], 256 | 64 | 128);
