@@ -11,7 +11,7 @@ class Bill extends ApiV3Base
     public function bind(array $param)
     {
         $data = [];
-        $data['appid'] = $this->service->miniAppID;
+        $data['appid'] = $this->entity->miniAppID;
         $data['type'] = 'PERSONAL_OPENID';
         $data['account'] = $param['openid'];
         $data['relation_type'] = 'DISTRIBUTOR';
@@ -43,7 +43,7 @@ class Bill extends ApiV3Base
 
             } else {
                 $data = [];
-                $data['appid'] = $this->service->miniAppID;
+                $data['appid'] = $this->entity->miniAppID;
                 $data['sub_mchid'] = $bill['mchID'];
                 $data['transaction_id'] = $bill['transaction'];
                 $data['out_order_no'] = $bill['number'];

@@ -17,8 +17,8 @@ class Pay extends ApiV3Base
     {
         $time = time();
         $data = [];
-        $data['sp_appid'] = $this->service->miniAppID;
-        $data['sp_mchid'] = $this->service->mchID;
+        $data['sp_appid'] = $this->entity->miniAppID;
+        $data['sp_mchid'] = $this->entity->mchID;
 
 //        $data['sub_appid'] = $params['appID'];
         $data['sub_mchid'] = $params['mchID'];
@@ -49,8 +49,8 @@ class Pay extends ApiV3Base
         $values['package'] = "prepay_id={$unified['prepay_id']}";
         $values['signType'] = 'RSA';
 
-        $message = "{$this->service->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
-        openssl_sign($message, $sign, $this->service->certEncrypt, 'sha256WithRSAEncryption');
+        $message = "{$this->entity->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
         $values['paySign'] = base64_encode($sign);//生成签名
 
         return $values;
@@ -66,8 +66,8 @@ class Pay extends ApiV3Base
     {
         $time = time();
         $data = [];
-        $data['combine_appid'] = $this->service->miniAppID;
-        $data['combine_mchid'] = $this->service->mchID;
+        $data['combine_appid'] = $this->entity->miniAppID;
+        $data['combine_mchid'] = $this->entity->mchID;
         $data['combine_out_trade_no'] = $order['orderPlatNumber'];
         $data['combine_payer_info'] = ['openid' => $order['orderOpenID']];
         $data['time_start'] = date(DATE_RFC3339, $time);
@@ -77,7 +77,7 @@ class Pay extends ApiV3Base
         $data['sub_orders'] = [];
         foreach ($order['sub_order'] as $sub) {
             $ord = [];
-            $ord['mchid'] = $this->service->mchID;
+            $ord['mchid'] = $this->entity->mchID;
             $ord['sub_mchid'] = $sub['subWxMchID'];
             $ord['attach'] = str_rand();
             $ord['out_trade_no'] = $sub['subNumber'];
@@ -100,8 +100,8 @@ class Pay extends ApiV3Base
         $values['package'] = "prepay_id={$unified['prepay_id']}";
         $values['signType'] = 'RSA';
 
-        $message = "{$this->service->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
-        openssl_sign($message, $sign, $this->service->certEncrypt, 'sha256WithRSAEncryption');
+        $message = "{$this->entity->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
         $values['paySign'] = base64_encode($sign);//生成签名
 
         return $values;

@@ -12,7 +12,7 @@ use esp\weiPay\library\Entity;
 abstract class ApiV3Base
 {
     protected $api = 'https://api.mch.weixin.qq.com';
-    protected $service;
+    protected $entity;
     protected $merchant;
     private $_debug;
     /**
@@ -22,9 +22,9 @@ abstract class ApiV3Base
 
     private $signCheck = true;
 
-    public function __construct(Entity $service)
+    public function __construct(Entity $entity)
     {
-        $this->service = $service;
+        $this->entity = $entity;
         $this->_debug = Debug::class();
     }
 
@@ -34,9 +34,9 @@ abstract class ApiV3Base
         return $this->_debug->relay($val, $prev);
     }
 
-    public function setService(Entity $service)
+    public function setService(Entity $entity)
     {
-        $this->service = $service;
+        $this->entity = $entity;
         return $this;
     }
 
@@ -66,13 +66,13 @@ abstract class ApiV3Base
     protected function sign(string $method, string $uri, string $body = '')
     {
         $method = strtoupper($method);
-        $mchID = $this->service->mchID;
+        $mchID = $this->entity->mchID;
         $nonce = sha1(uniqid('', true));
         $time = time();
         $message = "{$method}\n{$uri}\n{$time}\n{$nonce}\n{$body}\n";
-        openssl_sign($message, $sign, $this->service->certEncrypt, 'sha256WithRSAEncryption');
+        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
         $ts = 'WECHATPAY2-SHA256-RSA2048 mchid="%s",nonce_str="%s",timestamp="%d",serial_no="%s",signature="%s"';
-        return sprintf($ts, $mchID, $nonce, $time, $this->service->certSerial, base64_encode($sign));
+        return sprintf($ts, $mchID, $nonce, $time, $this->entity->certSerial, base64_encode($sign));
     }
 
     public function signCheck(bool $check)
@@ -194,7 +194,7 @@ abstract class ApiV3Base
      */
     public function decryptString(string $input)
     {
-        openssl_private_decrypt(base64_decode($input), $out, $this->service->certEncrypt, \OPENSSL_PKCS1_OAEP_PADDING);
+        openssl_private_decrypt(base64_decode($input), $out, $this->entity->certEncrypt, \OPENSSL_PKCS1_OAEP_PADDING);
         return $out;
     }
 
@@ -222,7 +222,7 @@ abstract class ApiV3Base
         $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
         if ($chk !== 1) return "wxAPIv3 Sign Error";
 
-        $value = $this->decryptToString($this->service->apiV3Key,
+        $value = $this->decryptToString($this->entity->apiV3Key,
             $data['resource']['associated_data'],
             $data['resource']['nonce'],
             $data['resource']['ciphertext']);

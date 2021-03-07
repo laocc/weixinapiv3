@@ -17,8 +17,8 @@ class Pay extends ApiV3Base
     {
         $time = time();
         $data = [];
-        $data['sp_appid'] = $this->service->miniAppID;
-        $data['sp_mchid'] = $this->service->mchID;
+        $data['sp_appid'] = $this->entity->miniAppID;
+        $data['sp_mchid'] = $this->entity->mchID;
 
 //        $data['sub_appid'] = $params['appID'];
         $data['sub_mchid'] = $params['mchID'];
@@ -49,8 +49,8 @@ class Pay extends ApiV3Base
         $values['package'] = "prepay_id={$unified['prepay_id']}";
         $values['signType'] = 'RSA';
 
-        $message = "{$this->service->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
-        openssl_sign($message, $sign, $this->service->certEncrypt, 'sha256WithRSAEncryption');
+        $message = "{$this->entity->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
         $values['paySign'] = base64_encode($sign);//生成签名
 
         return $values;
@@ -60,7 +60,7 @@ class Pay extends ApiV3Base
     public function query(array $option)
     {
         $param = [];
-        $param['sp_mchid'] = $this->service->mchID;
+        $param['sp_mchid'] = $this->entity->mchID;
         $param['sub_mchid'] = $option['mchID'];
 
         $data = $this->get("/v3/pay/partner/transactions/id/{$option['transaction_id']}", $param);

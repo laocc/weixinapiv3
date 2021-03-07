@@ -13,8 +13,8 @@ class Refund extends ApiV3Base
 
         foreach ($refDataAll as $ref) {
             $data = [];
-            $data['sp_mchid'] = $this->service->mchID;
-            $data['sp_appid'] = $this->service->mppAppID;
+            $data['sp_mchid'] = $this->entity->mchID;
+            $data['sp_appid'] = $this->entity->mppAppID;
             $data['sub_mchid'] = $ref['mchID'];
             $data['transaction_id'] = $ref['transaction'];
             $data['out_refund_no'] = $ref['number'];
