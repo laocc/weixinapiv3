@@ -5,7 +5,7 @@ namespace esp\weiPay\library;
 
 use esp\error\EspError;
 
-class Service
+class Entity
 {
     public $mchID;
     public $appID;
@@ -35,7 +35,7 @@ class Service
      */
     public function reService(array $svConf)
     {
-        if (!isset($svConf['mchID'])) throw new EspError("传入数据需要含有serviceModel的数据结构");
+        if (!isset($svConf['mchID'])) throw new EspError("传入数据需要含有微信支付商户基本数据结构");
 
         $this->mchID = $svConf['mchID'];
         $this->miniAppID = $svConf['miniAppID'];
@@ -44,6 +44,9 @@ class Service
         $this->apiV3Key = $svConf['v3Key'];
         $this->certSerial = $svConf['certSerial'];
 
+        /**
+         * 这里用到的密钥是在微信支付后台申请的
+         */
         $cert = _CERT . "/{$this->certSerial}/apiclient_key.pem";
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));
         return $this;

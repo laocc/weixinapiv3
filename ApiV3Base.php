@@ -6,7 +6,7 @@ namespace esp\weiPay;
 use esp\core\Debug;
 use esp\http\Http;
 use esp\weiPay\library\Crypt;
-use esp\weiPay\library\Service;
+use esp\weiPay\library\Entity;
 
 
 abstract class ApiV3Base
@@ -22,7 +22,7 @@ abstract class ApiV3Base
 
     private $signCheck = true;
 
-    public function __construct(Service $service)
+    public function __construct(Entity $service)
     {
         $this->service = $service;
         $this->_debug = Debug::class();
@@ -34,12 +34,22 @@ abstract class ApiV3Base
         return $this->_debug->relay($val, $prev);
     }
 
-    public function setService(Service $service)
+    public function setService(Entity $service)
     {
         $this->service = $service;
         return $this;
     }
 
+    /**
+     * 在接口中需要加密的时候，要设置密钥
+     *
+     * 参数例如：
+     * $data['account_info']['account_number'] = '@' . $bank['bankNumber'];
+     * 在值前加@表示此字段需要加密
+     *
+     * @param Crypt $crypt
+     * @return $this
+     */
     public function setCrypt(Crypt $crypt)
     {
         $this->crypt = $crypt;
@@ -212,12 +222,10 @@ abstract class ApiV3Base
         $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
         if ($chk !== 1) return "wxAPIv3 Sign Error";
 
-        $resource = $data['resource'];
-
         $value = $this->decryptToString($this->service->apiV3Key,
-            $resource['associated_data'],
-            $resource['nonce'],
-            $resource['ciphertext']);
+            $data['resource']['associated_data'],
+            $data['resource']['nonce'],
+            $data['resource']['ciphertext']);
         if ($value === false) return "数据解密失败";
 
         return json_decode($value, true);

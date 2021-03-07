@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay\common;
+namespace esp\weiPay\service;
 
 use esp\weiPay\ApiV3Base;
 use function esp\helper\str_rand;
@@ -54,6 +54,19 @@ class Pay extends ApiV3Base
         $values['paySign'] = base64_encode($sign);//生成签名
 
         return $values;
+    }
+
+
+    public function query(array $option)
+    {
+        $param = [];
+        $param['sp_mchid'] = $this->service->mchID;
+        $param['sub_mchid'] = $option['mchID'];
+
+        $data = $this->get("/v3/pay/partner/transactions/id/{$option['transaction_id']}", $param);
+        if (is_string($data)) return $data;
+
+        return $data;
     }
 
 

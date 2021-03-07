@@ -4,17 +4,25 @@ declare(strict_types=1);
 namespace esp\weiPay\library;
 
 
+/**
+ * 数据加解密
+ *
+ *
+ *
+ * Class Crypt
+ * @package esp\weiPay\library
+ */
 class Crypt
 {
     private $serial;
     private $cert;
     private $public;
 
-    public function __construct(array $wxPubCert)
+    public function __construct(string $certSerial)
     {
-        $this->serial = $wxPubCert['certSerial'];
-        $cert = _CERT . "/{$wxPubCert['certSerial']}/cert.pem";
-        $pub = _CERT . "/{$wxPubCert['certSerial']}/public.pem";
+        $this->serial = $certSerial;
+        $cert = _CERT . "/{$certSerial}/cert.pem";
+        $pub = _CERT . "/{$certSerial}/public.pem";
         $this->cert = openssl_get_privatekey(file_get_contents($cert));
         $this->public = openssl_get_publickey(file_get_contents($pub));
     }
@@ -35,10 +43,9 @@ class Crypt
     }
 
 
-
     /**
      * 用腾讯的公钥加密敏感信息
-     * 加密数组中值第一位是*的数据
+     * 加密数组中值第一位是@的数据
      * 支持三维数组
      * @param array $data
      * @return array

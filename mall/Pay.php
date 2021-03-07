@@ -59,10 +59,6 @@ class Pay extends ApiV3Base
     /**
      * 合单支付
      * @param array $order
-     * @return array|string
-     */
-    /**
-     * @param array $order
      * @param string $notify
      * @return array|string
      */
