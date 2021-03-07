@@ -8,7 +8,7 @@ https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/pages/index.shtml
 - library 基础库
 - merchant 直连商户
 - service 普通服务商
-- mall 电商收付通专用
+- ecommerce 电商收付通专用
 
 
 

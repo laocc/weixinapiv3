@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay\mall;
+namespace esp\weiPay\ecommerce;
 
 use esp\weiPay\ApiV3Base;
 
