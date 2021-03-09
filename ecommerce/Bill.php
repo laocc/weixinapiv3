@@ -12,9 +12,16 @@ class Bill extends ApiV3Base
     {
         $data = [];
         $data['appid'] = $this->entity->miniAppID;
-        $data['type'] = 'PERSONAL_OPENID';
-        $data['account'] = $param['openid'];
-        $data['relation_type'] = 'DISTRIBUTOR';
+        if (isset($param['openid'])) {
+            $data['type'] = 'PERSONAL_OPENID';
+            $data['account'] = $param['openid'];
+            $data['relation_type'] = 'DISTRIBUTOR';
+        } else {
+            $data['type'] = 'MERCHANT_ID';
+            $data['name'] = $param['name'];
+            $data['account'] = $param['mchid'];
+            $data['relation_type'] = 'PLATFORM';
+        }
         $unified = $this->post("/v3/ecommerce/profitsharing/receivers/add", $data);
         if (is_string($unified)) return $unified;
         return true;
