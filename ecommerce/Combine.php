@@ -60,8 +60,7 @@ class Combine extends ApiV3Base
     }
 
 
-
-    public function query(string $ordNumber)
+    public function query(string $ordNumber, string $mchID = null)
     {
         $data = $this->get("/v3/combine-transactions/out-trade-no/{$ordNumber}");
         if (is_string($data)) return $data;

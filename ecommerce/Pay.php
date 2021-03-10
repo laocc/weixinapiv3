@@ -57,4 +57,25 @@ class Pay extends ApiV3Base
     }
 
 
+    public function query(string $ordNumber, string $mchID)
+    {
+        $param = [];
+        $param['sp_mchid'] = $this->entity->mchID;
+        $param['sub_mchid'] = $mchID;
+
+        $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$ordNumber}", $param);
+        if (is_string($data)) return $data;
+        $values = [];
+
+        $values[] = [
+            'number' => $data['out_trade_no'],
+            'state' => $data['trade_state'],
+            'transaction' => $data['transaction_id'] ?? '',
+            'time' => strtotime($data['success_time'] ?? ''),
+        ];
+
+        return $values;
+    }
+
+
 }
