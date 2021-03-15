@@ -69,6 +69,7 @@ class Pay extends ApiV3Base
         $values[] = [
             'number' => $data['out_trade_no'],
             'state' => $data['trade_state'],
+            'desc' => $data['trade_state_desc'],
             'transaction' => $data['transaction_id'] ?? '',
             'time' => strtotime($data['success_time'] ?? ''),
         ];
