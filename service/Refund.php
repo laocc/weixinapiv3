@@ -33,8 +33,13 @@ class Refund extends ApiV3Base
 
         $data = $this->post("/v3/refund/domestic/refunds", $param);
         if (is_string($data)) return $data;
-        $values = [];
 
+        $values = [
+            'refund_id' => $data['refund_id'],
+            'number' => $data['out_refund_no'],
+            'time' => strtotime($data['create_time']),
+            'amount' => intval($data['amount']['payer_refund']),
+        ];
         return $values;
     }
 
