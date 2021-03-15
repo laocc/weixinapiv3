@@ -30,7 +30,7 @@ class Pay extends ApiV3Base
         $data['notify_url'] = $params['notify'];
 
         $data['settle_info'] = [];
-        $data['settle_info']['profit_sharing'] = true;
+        $data['settle_info']['profit_sharing'] = $params['sharing'] ?? true;
 
         $data['amount'] = [];
         $data['amount']['total'] = $params['amount'];
@@ -38,7 +38,6 @@ class Pay extends ApiV3Base
 
         $data['payer'] = [];
         $data['payer']['sp_openid'] = $params['openid'];
-//        $data['payer']['sub_openid'] = 'CNY';
 
         $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
         if (is_string($unified)) return $unified;

@@ -29,7 +29,7 @@ class Pay extends ApiV3Base
         $data['attach'] = $params['attach'];
         $data['notify_url'] = $params['notify'];
 
-        $data['settle_info'] = [];
+        $data['settle_info'] = [];//是否分账
         $data['settle_info']['profit_sharing'] = $params['sharing'] ?? false;
 
         $data['amount'] = [];
