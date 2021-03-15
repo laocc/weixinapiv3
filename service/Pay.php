@@ -69,8 +69,15 @@ class Pay extends ApiV3Base
         $param = [];
         $param['sp_mchid'] = $this->entity->mchID;
         $param['sub_mchid'] = $option['mchID'];
+        if (empty($option['number'] ?? '') and empty($option['transaction_id'] ?? '')) {
+            return '商户订单号或微信订单号至少要提供一个';
+        }
 
-        $data = $this->get("/v3/pay/partner/transactions/id/{$option['transaction_id']}", $param);
+        if (empty($option['transaction_id'])) {
+            $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$option['number']}", $param);
+        } else {
+            $data = $this->get("/v3/pay/partner/transactions/id/{$option['transaction_id']}", $param);
+        }
         if (is_string($data)) return $data;
 
         $value = [
