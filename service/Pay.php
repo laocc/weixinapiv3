@@ -30,7 +30,7 @@ class Pay extends ApiV3Base
         $data['notify_url'] = $params['notify'];
 
         $data['settle_info'] = [];
-        $data['settle_info']['profit_sharing'] = true;
+        $data['settle_info']['profit_sharing'] = $params['sharing'] ?? false;
 
         $data['amount'] = [];
         $data['amount']['total'] = $params['fee'];
@@ -40,6 +40,9 @@ class Pay extends ApiV3Base
         $data['payer']['sp_openid'] = $params['openid'];
 //        $data['payer']['sub_openid'] = 'CNY';
 
+        /**
+         * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter4_5_1.shtml
+         */
         $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
 
