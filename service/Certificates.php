@@ -11,6 +11,7 @@ class Certificates extends ApiV3Base
      * 下载平台证书
      * @param string $apiV3Key
      * @return array|string
+     *
      * https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay5_1.shtml
      */
     public function downloadPlatCert(string $apiV3Key)

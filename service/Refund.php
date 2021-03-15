@@ -13,10 +13,14 @@ class Refund extends ApiV3Base
      * 请求退款
      * @param array $refund
      * @return array|mixed|null|string
+     *
+     * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter4_5_9.shtml
      */
     public function apply(array $refund)
     {
         $param = [];
+        $param['sub_mchid'] = $refund['mchid'];
+
         $param['transaction_id'] = $refund['transaction_id'];
         $param['out_trade_no'] = $refund['out_trade_no'];
         $param['out_refund_no'] = $refund['out_refund_no'];
