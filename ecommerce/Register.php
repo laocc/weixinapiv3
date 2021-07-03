@@ -12,7 +12,7 @@ class Register extends ApiV3Base
     /**
      * 提交进件
      * @param $data
-     * @return \esp\http\Result
+     * @return \esp\http\HttpResult
      * https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/ecommerce/applyments/chapter3_1.shtml
      * https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter7_1_1.shtml
      */

@@ -9,8 +9,9 @@
     }
   ],
   "require": {
-    "php": ">7.2",
+    "php": ">7.1",
     "laocc/http": "*",
+    "laocc/debug": "*",
     "ext-curl": "*",
     "ext-xml": "*",
     "ext-json": "*"
