@@ -82,22 +82,24 @@ abstract class ApiV3Base
         return $this;
     }
 
-    protected function get(string $api, array $params = null)
+    protected function get(string $api, array $params = null, string $type = 'get', bool $returnCode = false)
     {
         if ($params) $api = $api . '?' . http_build_query($params);
         $option = [];
-        $option['type'] = 'get';
+        $option['type'] = $type;
+        $option['returnCode'] = $returnCode;
         $option['headers'] = [];
-        $option['headers']['Authorization'] = $this->sign('GET', $api);
+        $option['headers']['Authorization'] = $this->sign(strtoupper($type), $api);
 
         return $this->requestWx($option, $api);
     }
 
 
-    protected function post(string $api, array $data)
+    protected function post(string $api, array $data, string $type = 'post', bool $returnCode = false)
     {
         $option = [];
-        $option['type'] = 'post';
+        $option['type'] = $type;
+        $option['returnCode'] = $returnCode;
         $option['headers'] = [];
 
         if (!is_null($this->crypt)) {
@@ -107,7 +109,7 @@ abstract class ApiV3Base
         $this->debug($data);
         $data = json_encode($data, 256 | 64);
 
-        $option['headers']['Authorization'] = $this->sign('POST', $api, $data);
+        $option['headers']['Authorization'] = $this->sign(strtoupper($type), $api, $data);
 
         return $this->requestWx($option, $api, $data);
     }
@@ -118,6 +120,7 @@ abstract class ApiV3Base
         $option['agent'] = 'laocc/esp HttpClient/cURL';
         $option['encode'] = 'json';
         $option['header'] = true;
+        $option['allow'] = [200, 204];
         $option['headers']['Accept'] = "application/json";
         $option['headers']['Accept-Language'] = 'zh-CN';
         if ($option['type'] === 'upload') {
@@ -137,6 +140,9 @@ abstract class ApiV3Base
 
         //不签名验证
         if (!$this->signCheck) return $request->data();
+
+        //只要求返回对方响应状态码
+        if ($option['returnCode'] ?? 0) return $request->info('code');
 
         $header = $request->header();
         $json = $request->html();
