@@ -12,6 +12,7 @@
     "php": ">7.1",
     "laocc/http": "*",
     "laocc/debug": "*",
+    "ext-fileinfo": "*",
     "ext-curl": "*",
     "ext-xml": "*",
     "ext-json": "*"

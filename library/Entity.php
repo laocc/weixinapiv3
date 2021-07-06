@@ -16,15 +16,19 @@ class Entity
     public $certSerial;
 
     public $certEncrypt;
+    public $certPath;
 
     /**
      * 可以自行引用此类并实现此类的相关方法
-     * Service constructor.
+     *
+     * Entity constructor.
      * @param array $service
+     * @param string|null $certPath
      * @throws EspError
      */
-    public function __construct(array $service)
+    public function __construct(array $service, string $certPath = null)
     {
+        if ($certPath) $service['certPath'] = $certPath;
         $this->reService($service);
     }
 
@@ -44,12 +48,17 @@ class Entity
         $this->apiV3Key = $svConf['v3Key'];
         $this->certSerial = $svConf['certSerial'];
 
+        $this->certPath = $svConf['certPath'] ?? null;
+        if (is_null($this->certPath)) $this->certPath = defined('_CERT') ? _CERT : null;
+        if (!$this->certPath) throw new \Error('未指定证书目录');
+        $this->certPath = rtrim($this->certPath, '/');
+
         /**
          * 这里用到的密钥是在微信支付后台申请的
          */
-        $cert = _CERT . "/{$this->certSerial}/apiclient_key.pem";
+        $cert = $this->certPath . "/{$this->certSerial}/apiclient_key.pem";
         if (!is_readable($cert)) {
-            $cert = _CERT . "/{$this->mchID}/apiclient_key.pem";
+            $cert = $this->certPath . "/{$this->mchID}/apiclient_key.pem";
             if (!is_readable($cert)) throw new EspError("商户证书文件不存在，请检查");
         }
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));

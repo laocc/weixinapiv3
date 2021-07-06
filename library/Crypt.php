@@ -7,8 +7,6 @@ namespace esp\weiPay\library;
 /**
  * 数据加解密
  *
- *
- *
  * Class Crypt
  * @package esp\weiPay\library
  */
@@ -18,11 +16,14 @@ class Crypt
     private $cert;
     private $public;
 
-    public function __construct(string $certSerial)
+    public function __construct(string $certSerial, string $certPath = null)
     {
+        if (is_null($certPath)) $certPath = defined('_CERT') ? _CERT : null;
+        if (!$certPath) throw new \Error('未指定证书目录');
+        $certPath = rtrim($certPath, '/');
         $this->serial = $certSerial;
-        $cert = _CERT . "/{$certSerial}/cert.pem";
-        $pub = _CERT . "/{$certSerial}/public.pem";
+        $cert = $certPath . "/{$certSerial}/cert.pem";
+        $pub = $certPath . "/{$certSerial}/public.pem";
         $this->cert = openssl_get_privatekey(file_get_contents($cert));
         $this->public = openssl_get_publickey(file_get_contents($pub));
     }

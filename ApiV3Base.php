@@ -22,14 +22,15 @@ abstract class ApiV3Base
 
     private $signCheck = true;
 
-    public function __construct(Entity $entity)
+    public function __construct(Entity $entity, Debug $debug = null)
     {
         $this->entity = $entity;
-        $this->_debug = Debug::class();
+        $this->_debug = $debug;
     }
 
     protected function debug($val)
     {
+        if (is_null($this->_debug)) return false;
         $prev = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         return $this->_debug->relay($val, $prev);
     }
@@ -141,7 +142,7 @@ abstract class ApiV3Base
         $json = $request->html();
 //        print_r($request);
 
-        $cert = _CERT . "/{$header['WECHATPAY-SERIAL']}/public.pem";
+        $cert = $this->entity->certPath . "/{$header['WECHATPAY-SERIAL']}/public.pem";
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
         if (!is_null($this->crypt)) {
             $certEncrypt = $this->crypt->public();
@@ -204,7 +205,7 @@ abstract class ApiV3Base
      * @param $data
      * @return mixed|string
      */
-    public function notifyDecrypt($data)
+    public function notifyDecrypt(array $data)
     {
         $serial = getenv('HTTP_WECHATPAY_SERIAL');
         $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
@@ -216,7 +217,7 @@ abstract class ApiV3Base
         if (!is_null($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
-            $cert = _CERT . "/{$serial}/public.pem";
+            $cert = $this->entity->certPath . "/{$serial}/public.pem";
             $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
         }
         $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
