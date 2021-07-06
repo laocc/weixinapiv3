@@ -7,7 +7,11 @@ use esp\weiPay\ApiV3Base;
 
 class Complaint extends ApiV3Base
 {
-
+    /**
+     * 文档：
+     *
+     * https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter10_2_11.shtml
+     */
     private $comApi = '/v3/merchant-service/complaint-notifications';
 
     public function notifyUrl(string $action, string $url = null)
