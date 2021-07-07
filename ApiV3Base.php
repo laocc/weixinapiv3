@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace esp\weiPay;
 
-use esp\debug\Debug;
+use esp\core\Debug;
 use esp\http\Http;
 use esp\weiPay\library\Crypt;
 use esp\weiPay\library\Entity;

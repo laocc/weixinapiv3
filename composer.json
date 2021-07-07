@@ -11,8 +11,8 @@
   "require": {
     "php": ">7.1",
     "laocc/http": "*",
-    "laocc/debug": "*",
     "ext-fileinfo": "*",
+    "ext-openssl": "*",
     "ext-curl": "*",
     "ext-xml": "*",
     "ext-json": "*"
