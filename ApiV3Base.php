@@ -3,17 +3,16 @@ declare(strict_types=1);
 
 namespace esp\weiPay;
 
-use esp\core\Debug;
+use esp\core\Library;
 use esp\http\Http;
 use esp\weiPay\library\Crypt;
 use esp\weiPay\library\Entity;
 
-abstract class ApiV3Base
+abstract class ApiV3Base extends Library
 {
     protected $api = 'https://api.mch.weixin.qq.com';
     protected $entity;
     protected $merchant;
-    private $_debug;
     /**
      * @var $crypt Crypt
      */
@@ -22,17 +21,9 @@ abstract class ApiV3Base
     private $signCheck = true;
     private $returnHttp = false;
 
-    public function __construct(Entity $entity, Debug $debug = null)
+    public function _init(Entity $entity)
     {
         $this->entity = $entity;
-        $this->_debug = $debug;
-    }
-
-    protected function debug($val)
-    {
-        if (is_null($this->_debug)) return true;
-        $prev = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-        return $this->_debug->relay($val, $prev);
     }
 
     public function setService(Entity $entity)
