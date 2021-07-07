@@ -30,7 +30,7 @@ abstract class ApiV3Base
 
     protected function debug($val)
     {
-        if (_CLI) return true;
+        if (is_null($this->_debug)) return true;
         $prev = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         return $this->_debug->relay($val, $prev);
     }
@@ -93,9 +93,9 @@ abstract class ApiV3Base
         if ($params) $api = $api . '?' . http_build_query($params);
         if (!isset($option['type'])) $option['type'] = 'get';
         $option['headers'] = [];
-        $option['headers']['Authorization'] = $this->sign('GET', $api);
+        $option['headers']['Authorization'] = $this->sign(strtoupper($option['type']), $api);
 
-        return $this->requestWx($option, $api,);
+        return $this->requestWx($option, $api);
     }
 
 
@@ -111,7 +111,7 @@ abstract class ApiV3Base
         $this->debug($data);
         $data = json_encode($data, 256 | 64);
 
-        $option['headers']['Authorization'] = $this->sign('POST', $api, $data);
+        $option['headers']['Authorization'] = $this->sign(strtoupper($option['type']), $api, $data);
 
         return $this->requestWx($option, $api, $data);
     }
@@ -119,8 +119,9 @@ abstract class ApiV3Base
     protected function requestWx(array $option, string $api, string $data = null)
     {
         if (!isset($option['type'])) $option['type'] = 'post';
+        if (!isset($option['encode'])) $option['encode'] = 'json';
+        if (!isset($option['decode'])) $option['decode'] = 'json';
         $option['agent'] = 'laocc/esp HttpClient/cURL';
-        $option['encode'] = 'json';
         $option['header'] = true;
         $option['allow'] = [200, 204];
         $option['headers']['Accept'] = "application/json";
