@@ -21,6 +21,7 @@ class Crypt
         if (is_null($certPath)) $certPath = defined('_CERT') ? _CERT : null;
         if (!$certPath) throw new \Error('未指定证书目录');
         $certPath = rtrim($certPath, '/');
+
         $this->serial = $certSerial;
         $cert = $certPath . "/{$certSerial}/cert.pem";
         $pub = $certPath . "/{$certSerial}/public.pem";
@@ -66,7 +67,7 @@ class Crypt
                         $data[$key][$k] = $this->encrypt(substr($val, 1));
                     }
                 }
-            } else if (is_string($value) && $value[0] === '@') {
+            } else if (is_string($value) && !empty($value) && $value[0] === '@') {
                 $data[$key] = $this->encrypt(substr($value, 1));
             }
         }

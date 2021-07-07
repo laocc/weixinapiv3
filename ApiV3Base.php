@@ -8,7 +8,6 @@ use esp\http\Http;
 use esp\weiPay\library\Crypt;
 use esp\weiPay\library\Entity;
 
-
 abstract class ApiV3Base
 {
     protected $api = 'https://api.mch.weixin.qq.com';
@@ -21,6 +20,7 @@ abstract class ApiV3Base
     protected $crypt;
 
     private $signCheck = true;
+    private $returnHttp = false;
 
     public function __construct(Entity $entity, Debug $debug = null)
     {
@@ -30,7 +30,7 @@ abstract class ApiV3Base
 
     protected function debug($val)
     {
-        if (is_null($this->_debug)) return false;
+        if (_CLI) return true;
         $prev = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
         return $this->_debug->relay($val, $prev);
     }
@@ -82,24 +82,26 @@ abstract class ApiV3Base
         return $this;
     }
 
-    protected function get(string $api, array $params = null, string $type = 'get', bool $returnCode = false)
+    public function returnHttp(bool $check)
+    {
+        $this->returnHttp = $check;
+        return $this;
+    }
+
+    protected function get(string $api, array $params = null, array $option = [])
     {
         if ($params) $api = $api . '?' . http_build_query($params);
-        $option = [];
-        $option['type'] = $type;
-        $option['returnCode'] = $returnCode;
+        if (!isset($option['type'])) $option['type'] = 'get';
         $option['headers'] = [];
-        $option['headers']['Authorization'] = $this->sign(strtoupper($type), $api);
+        $option['headers']['Authorization'] = $this->sign('GET', $api);
 
-        return $this->requestWx($option, $api);
+        return $this->requestWx($option, $api,);
     }
 
 
-    protected function post(string $api, array $data, string $type = 'post', bool $returnCode = false)
+    protected function post(string $api, array $data, array $option = [])
     {
-        $option = [];
-        $option['type'] = $type;
-        $option['returnCode'] = $returnCode;
+        if (!isset($option['type'])) $option['type'] = 'post';
         $option['headers'] = [];
 
         if (!is_null($this->crypt)) {
@@ -109,7 +111,7 @@ abstract class ApiV3Base
         $this->debug($data);
         $data = json_encode($data, 256 | 64);
 
-        $option['headers']['Authorization'] = $this->sign(strtoupper($type), $api, $data);
+        $option['headers']['Authorization'] = $this->sign('POST', $api, $data);
 
         return $this->requestWx($option, $api, $data);
     }
@@ -136,7 +138,7 @@ abstract class ApiV3Base
 
         $this->debug($request);
 
-        if ($err = $request->error()) return "wxAPIv3 Error:{$err}";
+        if ($err = $request->error()) return "Error:{$err}";
 
         //不签名验证
         if (!$this->signCheck) return $request->data();
@@ -146,7 +148,6 @@ abstract class ApiV3Base
 
         $header = $request->header();
         $json = $request->html();
-//        print_r($request);
 
         $cert = $this->entity->certPath . "/{$header['WECHATPAY-SERIAL']}/public.pem";
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
@@ -157,7 +158,9 @@ abstract class ApiV3Base
         }
         $signature = \base64_decode($header['WECHATPAY-SIGNATURE']);
         $chk = \openssl_verify($message, $signature, $certEncrypt, 'sha256WithRSAEncryption');
-        if ($chk !== 1) return "wxAPIv3 Sign Error";
+        if ($chk !== 1) return "Error:请求收到的结果签名验证失败";
+
+        if ($this->returnHttp) return $request;
 
         return $request->data();
     }
@@ -211,7 +214,7 @@ abstract class ApiV3Base
      * @param $data
      * @return mixed|string
      */
-    public function notifyDecrypt(array $data)
+    public function notifyDecrypt($data)
     {
         $serial = getenv('HTTP_WECHATPAY_SERIAL');
         $time = getenv('HTTP_WECHATPAY_TIMESTAMP');

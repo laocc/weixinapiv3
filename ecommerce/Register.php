@@ -10,9 +10,35 @@ class Register extends ApiV3Base
 {
 
     /**
+     * 更换结算账户
+     * @return array|string
+     */
+    public function bank(array $param)
+    {
+        $post = [];
+        $post['account_type'] = 'ACCOUNT_TYPE_BUSINESS';//账户类型，对公
+        if ($param['private'] ?? 0) $post['account_type'] = 'ACCOUNT_TYPE_PRIVATE';//账户类型，对私
+        $post['account_bank'] = $param['bank'];//开户银行
+        $post['bank_address_code'] = $param['area'];//开户银行省市编码
+        if ($param['bank'] === '其他银行') {
+            $post['bank_name'] = $param['name'];//开户银行全称 （含支行）
+            if (strpos($param['name'], $param['bank']) !== 0) {
+                $post['bank_name'] = $param['bank'] . $param['name'];//开户银行全称 （含支行）
+            }
+        }
+        if ($param['index'] ?? '') $post['bank_branch_id'] = $param['index'];//开户银行联行号
+        $post['account_number'] = '@' . $param['number'];//银行帐号
+
+        $data = $this->returnHttp(true)->post("/v3/apply4sub/sub_merchants/{$param['mchid']}/modify-settlement", $post);
+        return $data;
+    }
+
+
+    /**
      * 提交进件
-     * @param $data
-     * @return \esp\http\HttpResult
+     *
+     * @param array $data
+     * @return array|\esp\http\HttpResult|mixed|string|null
      * https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/ecommerce/applyments/chapter3_1.shtml
      * https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter7_1_1.shtml
      */

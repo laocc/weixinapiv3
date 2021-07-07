@@ -47,8 +47,8 @@ class Entity
         $this->apiKey = $svConf['apiKey'];
         $this->apiV3Key = $svConf['v3Key'];
         $this->certSerial = $svConf['certSerial'];
-
         $this->certPath = $svConf['certPath'] ?? null;
+
         if (is_null($this->certPath)) $this->certPath = defined('_CERT') ? _CERT : null;
         if (!$this->certPath) throw new \Error('未指定证书目录');
         $this->certPath = rtrim($this->certPath, '/');

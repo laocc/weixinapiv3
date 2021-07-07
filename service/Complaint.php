@@ -23,15 +23,15 @@ class Complaint extends ApiV3Base
             case 'set':
                 $param = [];
                 $param['url'] = $url;
-                $data = $this->post($this->comApi, $param, 'post');
+                $data = $this->post($this->comApi, $param, ['type' => 'post']);
                 break;
             case 'update':
                 $param = [];
                 $param['url'] = $url;
-                $data = $this->post($this->comApi, $param, 'put');
+                $data = $this->post($this->comApi, $param, ['type' => 'put']);
                 break;
             case 'delete':
-                $data = $this->get($this->comApi, null, 'delete');
+                $data = $this->get($this->comApi, null, ['type' => 'delete']);
                 break;
             default:
                 return '';
@@ -49,7 +49,7 @@ class Complaint extends ApiV3Base
         $param['complainted_mchid'] = $mchID;
         $param['response_content'] = $content;
 //        $param['response_images'] = [];
-        $data = $this->post($this->comApi, $param, 'post', true);
+        $data = $this->post($this->comApi, $param, ['type' => 'post', 'returnCode' => true]);
         if (is_string($data)) return $data;
         return $data === 204;
     }
