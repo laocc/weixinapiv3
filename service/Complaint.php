@@ -45,11 +45,11 @@ class Complaint extends ApiV3Base
     public function reply(string $mchID, string $comID, string $content)
     {
         $param = [];
-        $param['complaint_id'] = $comID;
         $param['complainted_mchid'] = $mchID;
         $param['response_content'] = $content;
 //        $param['response_images'] = [];
-        $data = $this->post($this->comApi, $param, ['type' => 'post', 'returnCode' => true]);
+        $data = $this->post("/v3/merchant-service/complaints-v2/{$comID}/response",
+            $param, ['type' => 'post', 'returnCode' => true]);
         if (is_string($data)) return $data;
         return $data === 204;
     }
