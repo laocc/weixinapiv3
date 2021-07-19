@@ -27,12 +27,12 @@ class Refund extends ApiV3Base
 
             $unified = $this->post("/v3/ecommerce/refunds/apply", $data);
             if (is_string($unified)) {
-                $value[$ref['mchID']] = $unified;
+                $value[$ref['refID']] = $unified;
 
             } else {
-                $value[$ref['mchID']] = [
-                    'refund_id' => $unified['refund_id'],
-                    'number' => $unified['out_refund_no'],
+                $value[$ref['refID']] = [
+                    'refund_id' => $unified['refund_id'],//微信退款单号
+                    'number' => $unified['out_refund_no'],//商户退款单号
                     'time' => strtotime($unified['create_time']),
                     'amount' => intval($unified['amount']['payer_refund']),
                 ];
