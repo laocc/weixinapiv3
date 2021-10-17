@@ -10,6 +10,8 @@ class Pay extends ApiV3Base
 {
     /**
      * 发起公众号、小程序支付
+     * 服务商和直连都可用，取决于 $this->entity->isService
+     *
      * @param array $params
      * @return array|string
      */
@@ -17,11 +19,20 @@ class Pay extends ApiV3Base
     {
         $time = time();
         $data = [];
-        $data['sp_appid'] = $this->entity->miniAppID;
-        $data['sp_mchid'] = $this->entity->mchID;
 
-//        $data['sub_appid'] = $params['appID'];
-        $data['sub_mchid'] = $params['mchID'];
+        if ($this->entity->isService) {
+            $data['sp_appid'] = $this->entity->appID;
+            $data['sp_mchid'] = $this->entity->mchID;
+
+            if (isset($params['appID'])) {
+                //用子商户的appid
+                $data['sub_appid'] = $params['appID'];
+            }
+            $data['sub_mchid'] = $params['mchID'];
+        } else {
+            $data['appid'] = $this->entity->appID;
+            $data['mchid'] = $this->entity->mchID;
+        }
 
         $data['description'] = $params['subject'];
         $data['out_trade_no'] = $params['id'];
@@ -30,17 +41,25 @@ class Pay extends ApiV3Base
         $data['notify_url'] = $params['notify'];
 
         $data['settle_info'] = [];
-        $data['settle_info']['profit_sharing'] = true;
+        $data['settle_info']['profit_sharing'] = boolval($params['sharing'] ?? 1);//分账
 
         $data['amount'] = [];
         $data['amount']['total'] = $params['fee'];
         $data['amount']['currency'] = 'CNY';
 
         $data['payer'] = [];
-        $data['payer']['sp_openid'] = $params['openid'];
-//        $data['payer']['sub_openid'] = 'CNY';
+        if ($this->entity->isService) {
+            if (isset($params['appID'])) {
+                $data['payer']['sub_openid'] = $params['openid'];
+            } else {
+                $data['payer']['sp_openid'] = $params['openid'];
+            }
+            $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
+        } else {
+            $data['payer']['openid'] = $params['openid'];
+            $unified = $this->post("/v3/pay/transactions/jsapi", $data);
+        }
 
-        $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
 
         $values = array();
@@ -49,7 +68,7 @@ class Pay extends ApiV3Base
         $values['package'] = "prepay_id={$unified['prepay_id']}";
         $values['signType'] = 'RSA';
 
-        $message = "{$this->entity->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        $message = "{$this->entity->appID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
         openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
         $values['paySign'] = base64_encode($sign);//生成签名
 

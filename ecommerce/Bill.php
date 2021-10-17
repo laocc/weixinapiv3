@@ -16,7 +16,7 @@ class Bill extends ApiV3Base
     public function bind(array $param)
     {
         $data = [];
-        $data['appid'] = $this->entity->miniAppID;
+        $data['appid'] = $this->entity->appID;
         if (isset($param['openid'])) {
             $data['type'] = 'PERSONAL_OPENID';
             $data['account'] = $param['openid'];
@@ -64,7 +64,7 @@ class Bill extends ApiV3Base
                 $unified = $this->post("/v3/ecommerce/profitsharing/finish-order", $data);
 
             } else {
-                $data['appid'] = $this->entity->miniAppID;
+                $data['appid'] = $this->entity->appID;
                 $data['finish'] = $bill['finish'];
                 $data['receivers'] = $bill['receivers'];
                 $unified = $this->post("/v3/ecommerce/profitsharing/orders", $data);

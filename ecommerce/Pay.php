@@ -17,7 +17,7 @@ class Pay extends ApiV3Base
     {
         $time = time();
         $data = [];
-        $data['sp_appid'] = $this->entity->miniAppID;
+        $data['sp_appid'] = $this->entity->appID;
         $data['sp_mchid'] = $this->entity->mchID;
 
 //        $data['sub_appid'] = $params['appID'];
@@ -48,7 +48,7 @@ class Pay extends ApiV3Base
         $values['package'] = "prepay_id={$unified['prepay_id']}";
         $values['signType'] = 'RSA';
 
-        $message = "{$this->entity->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        $message = "{$this->entity->appID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
         openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
         $values['paySign'] = base64_encode($sign);//生成签名
 

@@ -18,7 +18,7 @@ class Combine extends ApiV3Base
     {
         $time = time();
         $data = [];
-        $data['combine_appid'] = $this->entity->miniAppID;
+        $data['combine_appid'] = $this->entity->appID;
         $data['combine_mchid'] = $this->entity->mchID;
         $data['combine_out_trade_no'] = $order['number'];
         $data['combine_payer_info'] = ['openid' => $order['openid']];
@@ -52,7 +52,7 @@ class Combine extends ApiV3Base
         $values['package'] = "prepay_id={$unified['prepay_id']}";
         $values['signType'] = 'RSA';
 
-        $message = "{$this->entity->miniAppID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        $message = "{$this->entity->appID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
         openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
         $values['paySign'] = base64_encode($sign);//生成签名
 

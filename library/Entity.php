@@ -5,15 +5,17 @@ namespace esp\weiPay\library;
 
 use esp\error\EspError;
 
+/**
+ * 服务器，或直连商户，身份构造
+ */
 class Entity
 {
     public $mchID;
     public $appID;
-    public $miniAppID;
-    public $mppAppID;
     public $apiKey;
     public $apiV3Key;
     public $certSerial;
+    public $isService;//是否服务商
 
     public $certEncrypt;
     public $certPath;
@@ -22,14 +24,15 @@ class Entity
      * 可以自行引用此类并实现此类的相关方法
      *
      * Entity constructor.
-     * @param array $service
+     * @param array $conf
      * @param string|null $certPath
      * @throws EspError
      */
-    public function __construct(array $service, string $certPath = null)
+    public function __construct(array $conf, string $certPath = null)
     {
-        if ($certPath) $service['certPath'] = $certPath;
-        $this->reService($service);
+        if ($certPath) $conf['certPath'] = $certPath;
+        $this->isService = boolval($conf['service'] ?? 1);
+        $this->reConfig($conf);
     }
 
     /**
@@ -37,13 +40,13 @@ class Entity
      * @return $this
      * @throws EspError
      */
-    public function reService(array $svConf)
+    public function reConfig(array $svConf): Entity
     {
         if (!isset($svConf['mchID'])) throw new EspError("传入数据需要含有微信支付商户基本数据结构");
 
-        $this->mchID = $svConf['mchID'];
-        $this->miniAppID = $svConf['miniAppID'];
-        $this->mppAppID = $svConf['mppAppID'];
+        $this->mchID = $svConf['mchID'] ?? '';
+        $this->appID = $svConf['appID'] ?? ($svConf['miniAppID'] ?? ($svConf['mppAppID'] ?? ''));
+
         $this->apiKey = $svConf['apiKey'];
         $this->apiV3Key = $svConf['v3Key'];
         $this->certSerial = $svConf['certSerial'];
@@ -69,8 +72,7 @@ class Entity
     {
         return json_encode([
             'mchID' => $this->mchID,
-            'miniAppID' => $this->miniAppID,
-            'mppAppID' => $this->mppAppID,
+            'appID' => $this->appID,
             'certSerial' => $this->certSerial,
         ], 256 | 64 | 128);
     }

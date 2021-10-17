@@ -11,6 +11,9 @@ use esp\weiPay\library\Entity;
 abstract class ApiV3Base extends Library
 {
     protected $api = 'https://api.mch.weixin.qq.com';
+    /**
+     * @var $entity Entity
+     */
     protected $entity;
     protected $merchant;
     /**
