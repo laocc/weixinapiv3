@@ -25,7 +25,7 @@ class Pay extends ApiV3Base
 
         $data['description'] = $params['description'];
         $data['out_trade_no'] = strval($params['number']);
-        $data['time_expire'] = date(DATE_RFC3339, $time);
+        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 60));
         $data['attach'] = $params['attach'];
         $data['notify_url'] = $params['notify'];
 
@@ -43,6 +43,7 @@ class Pay extends ApiV3Base
         if (is_string($unified)) return $unified;
 
         $values = array();
+        $values['appId'] = $this->entity->appID;
         $values['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
         $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
         $values['package'] = "prepay_id={$unified['prepay_id']}";

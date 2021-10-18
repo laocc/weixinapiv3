@@ -58,7 +58,7 @@ abstract class ApiV3Base extends Library
      * @return string
      * https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay4_0.shtml
      */
-    protected function sign(string $method, string $uri, string $body = '')
+    protected function sign(string $method, string $uri, string $body = ''): string
     {
         $method = strtoupper($method);
         $mchID = $this->entity->mchID;
@@ -209,13 +209,15 @@ abstract class ApiV3Base extends Library
      * @param $data
      * @return mixed|string
      */
-    public function notifyDecrypt($data)
+    public function notifyDecrypt()
     {
         $serial = getenv('HTTP_WECHATPAY_SERIAL');
         $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
         $nonce = getenv('HTTP_WECHATPAY_NONCE');
         $sign = getenv('HTTP_WECHATPAY_SIGNATURE');
         $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        if (empty($data)) return '未接收到数据';
 
         $message = "{$time}\n{$nonce}\n{$json}\n";
         if (!is_null($this->crypt)) {
