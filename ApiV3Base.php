@@ -209,7 +209,7 @@ abstract class ApiV3Base extends Library
      * @param $data
      * @return mixed|string
      */
-    public function notifyDecrypt()
+    public function notifyDecrypt(array &$data)
     {
         $serial = getenv('HTTP_WECHATPAY_SERIAL');
         $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
