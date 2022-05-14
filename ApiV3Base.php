@@ -181,8 +181,6 @@ abstract class ApiV3Base extends Library
          * 微信第1版Api中是这样解密的：
          * $xml = openssl_decrypt(base64_decode($code), "AES-256-ECB", md5($key), OPENSSL_RAW_DATA);
          */
-
-
         return \openssl_decrypt(substr($ciphertext, 0, -16),
             'aes-256-gcm',
             $aesKey,
@@ -206,7 +204,7 @@ abstract class ApiV3Base extends Library
 
     /**
      * 受理通知数据，验签，并解密
-     * @param $data
+     * @param array &$data
      * @return mixed|string
      */
     public function notifyDecrypt(array &$data)
