@@ -8,6 +8,74 @@ use function esp\helper\str_rand;
 
 class Pay extends ApiV3Base
 {
+
+    /**
+     * app支付
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function app(array $params)
+    {
+        $time = time();
+        $data = [];
+
+        if ($this->entity->isService) {
+            $data['sp_appid'] = $this->entity->appID;
+            $data['sp_mchid'] = $this->entity->mchID;
+
+            if (isset($params['appID'])) {
+                //用子商户的appid
+                $data['sub_appid'] = $params['appID'];
+            }
+            $data['sub_mchid'] = $params['mchID'];
+        } else {
+            $data['appid'] = $this->entity->appID;
+            $data['mchid'] = $this->entity->mchID;
+        }
+
+        $data['description'] = $params['description'];
+        $data['out_trade_no'] = strval($params['number']);
+        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 60));
+        $data['attach'] = $params['attach'];
+        $data['notify_url'] = $params['notify'];
+
+        $data['settle_info'] = [];
+        $data['settle_info']['profit_sharing'] = boolval($params['sharing'] ?? 0);//分账
+
+        $data['amount'] = [];
+        $data['amount']['total'] = $params['fee'];
+        $data['amount']['currency'] = 'CNY';
+
+        if ($this->entity->isService) {
+            $unified = $this->post("/v3/pay/partner/transactions/app", $data);
+        } else {
+            $unified = $this->post("/v3/pay/transactions/app", $data);
+        }
+
+        if (is_string($unified)) return $unified;
+
+        /**
+         * 这里组合的是送给前端用的 orderInfo部分内容
+         */
+        $value = array();
+        $value['appid'] = $this->entity->appID;
+        $value['partnerid'] = $this->entity->mchID;
+        $value['prepayid'] = $unified['prepay_id'];
+        $value['package'] = "Sign=WXPay";
+        $value['noncestr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
+        $value['timestamp'] = strval($time);//这timeStamp中间的S必须是大写
+
+        $message = "{$this->entity->appID}\n{$value['timestamp']}\n{$value['noncestr']}\n{$value['prepayid']}\n";
+        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
+        $value['sign'] = base64_encode($sign);//生成签名
+
+        return $value;
+    }
+
+
+
+
     /**
      * 发起公众号、小程序支付
      * 服务商和直连都可用，取决于 $this->entity->isService

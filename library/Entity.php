@@ -40,15 +40,22 @@ class Entity
     {
         if (!isset($svConf['mchID'])) throw new \Error("传入数据需要含有微信支付商户基本数据结构");
 
-        $this->mchID = $svConf['mchID'] ?? '';
-        $this->appID = $svConf['appID'] ?? ($svConf['miniAppID'] ?? ($svConf['mppAppID'] ?? ''));
+        $this->mchID = $svConf['mchID'] ?? ($svConf['mchid'] ?? '');
+        foreach (['appID', 'appid', 'miniAppID', 'mppAppID'] as $ak) {
+            if (isset($svConf[$ak])) {
+                $this->appID = $svConf[$ak];
+                break;
+            }
+        }
 
         $this->apiKey = $svConf['apiKey'];
         $this->apiV3Key = $svConf['v3Key'];
         $this->certSerial = $svConf['certSerial'];
         $this->certPath = $svConf['certPath'] ?? null;
 
-        if (is_null($this->certPath)) $this->certPath = defined('_CERT') ? _CERT : null;
+        if (is_null($this->certPath)) {
+            $this->certPath = defined('_CERT') ? _CERT : (_ROOT . '/cert');
+        }
         if (!$this->certPath) throw new \Error('未指定证书目录');
         $this->certPath = rtrim($this->certPath, '/');
 
