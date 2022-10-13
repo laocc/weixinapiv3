@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace esp\weiPay\library;
 
+use esp\error\Error;
+
 /**
  * 服务器，或直连商户，身份构造
  */
@@ -38,7 +40,7 @@ class Entity
      */
     public function reConfig(array $svConf): Entity
     {
-        if (!isset($svConf['mchID'])) throw new \Error("传入数据需要含有微信支付商户基本数据结构");
+        if (!isset($svConf['mchID'])) throw new Error("传入数据需要含有微信支付商户基本数据结构");
 
         $this->mchID = $svConf['mchID'] ?? ($svConf['mchid'] ?? '');
         foreach (['appID', 'appid', 'miniAppID', 'mppAppID'] as $ak) {
@@ -56,7 +58,7 @@ class Entity
         if (is_null($this->certPath)) {
             $this->certPath = defined('_CERT') ? _CERT : (_ROOT . '/cert');
         }
-        if (!$this->certPath) throw new \Error('未指定证书目录');
+        if (!$this->certPath) throw new Error('未指定证书目录');
         $this->certPath = rtrim($this->certPath, '/');
 
         /**
@@ -65,7 +67,7 @@ class Entity
         $cert = $this->certPath . "/{$this->certSerial}/apiclient_key.pem";
         if (!is_readable($cert)) {
             $cert = $this->certPath . "/{$this->mchID}/apiclient_key.pem";
-            if (!is_readable($cert)) throw new \Error("商户证书文件不存在，请检查");
+            if (!is_readable($cert)) throw new Error("商户证书文件不存在，请检查");
         }
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));
         return $this;

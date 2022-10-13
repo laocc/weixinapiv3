@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace esp\weiPay\library;
 
+use esp\error\Error;
 
 /**
  * 数据加解密
@@ -19,7 +20,7 @@ class Crypt
     public function __construct(string $certSerial, string $certPath = null)
     {
         if (is_null($certPath)) $certPath = defined('_CERT') ? _CERT : null;
-        if (!$certPath) throw new \Error('未指定证书目录');
+        if (!$certPath) throw new Error('未指定证书目录');
         $certPath = rtrim($certPath, '/');
 
         $this->serial = $certSerial;
