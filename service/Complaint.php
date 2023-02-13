@@ -12,7 +12,7 @@ class Complaint extends ApiV3Base
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter10_2_11.shtml
      */
-    private $comApi = '/v3/merchant-service/complaint-notifications';
+    private string $comApi = '/v3/merchant-service/complaint-notifications';
 
     public function notifyUrl(string $action, string $url = null)
     {

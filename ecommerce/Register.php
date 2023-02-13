@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace esp\weiPay\ecommerce;
 
 use esp\http\HttpResult;
-use function esp\helper\rnd;
 use esp\weiPay\ApiV3Base;
+use function esp\helper\rnd;
 
 class Register extends ApiV3Base
 {

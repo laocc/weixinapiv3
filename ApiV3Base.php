@@ -10,19 +10,11 @@ use esp\weiPay\library\Entity;
 
 abstract class ApiV3Base extends Library
 {
-    protected $api = 'https://api.mch.weixin.qq.com';
-    /**
-     * @var $entity Entity
-     */
-    protected $entity;
-    protected $merchant;
-    /**
-     * @var $crypt Crypt
-     */
-    protected $crypt;
-
-    private $signCheck = true;
-    private $returnHttp = false;
+    protected string $api = 'https://api.mch.weixin.qq.com';
+    protected Entity $entity;
+    protected Crypt $crypt;
+    private bool $signCheck = true;
+    private bool $returnHttp = false;
 
     public function _init(Entity $entity)
     {
@@ -98,7 +90,7 @@ abstract class ApiV3Base extends Library
         if (!isset($option['type'])) $option['type'] = 'post';
         $option['headers'] = [];
 
-        if (!is_null($this->crypt)) {
+        if (isset($this->crypt)) {
             $data = $this->crypt->encryptArray($data);
             $option['headers']['Wechatpay-Serial'] = $this->crypt->serial();
         }
@@ -146,7 +138,7 @@ abstract class ApiV3Base extends Library
 
         $cert = $this->entity->certPath . "/{$header['WECHATPAY-SERIAL']}/public.pem";
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
-        if (!is_null($this->crypt)) {
+        if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
             $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
@@ -218,7 +210,7 @@ abstract class ApiV3Base extends Library
         if (empty($data)) return '未接收到数据';
 
         $message = "{$time}\n{$nonce}\n{$json}\n";
-        if (!is_null($this->crypt)) {
+        if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
             $cert = $this->entity->certPath . "/{$serial}/public.pem";

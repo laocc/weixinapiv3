@@ -10,15 +10,15 @@ use esp\error\Error;
  */
 class Entity
 {
-    public $mchID;
-    public $appID;
-    public $apiKey;
-    public $apiV3Key;
-    public $certSerial;
-    public $isService;//是否服务商
+    public string $mchID;
+    public string $appID;
+    public string $apiKey;
+    public string $apiV3Key;
+    public string $certSerial;
+    public bool $isService;//是否服务商
+    public string $certPath;
 
     public $certEncrypt;
-    public $certPath;
 
     /**
      * 可以自行引用此类并实现此类的相关方法
@@ -55,7 +55,7 @@ class Entity
         $this->certSerial = $svConf['certSerial'];
         $this->certPath = $svConf['certPath'] ?? null;
 
-        if (is_null($this->certPath)) {
+        if (!isset($this->certPath)) {
             $this->certPath = defined('_CERT') ? _CERT : (_ROOT . '/cert');
         }
         if (!$this->certPath) throw new Error('未指定证书目录');

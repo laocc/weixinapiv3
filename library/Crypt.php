@@ -13,7 +13,7 @@ use esp\error\Error;
  */
 class Crypt
 {
-    private $serial;
+    private string $serial;
     private $cert;
     private $public;
 

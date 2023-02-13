@@ -11,7 +11,7 @@ class Account extends ApiV3Base
 
     /**
      * 查询二级商户账户
-     * @param $mchID
+     * @param string $mchID
      * @return array|string
      */
     public function query(string $mchID)

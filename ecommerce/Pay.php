@@ -60,7 +60,7 @@ class Pay extends ApiV3Base
     /**
      * @param string $ordNumber
      * @param string $mchID
-     * @return array|mixed|null|string
+     * @return array|string
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter7_2_5.shtml
      */

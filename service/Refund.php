@@ -12,7 +12,7 @@ class Refund extends ApiV3Base
     /**
      * 请求退款
      * @param array $refund
-     * @return array|mixed|null|string
+     * @return array|string
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter4_5_9.shtml
      */
