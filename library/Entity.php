@@ -12,7 +12,6 @@ class Entity
 {
     public string $mchID;
     public string $appID;
-    public string $apiKey;
     public string $apiV3Key;
     public string $certSerial;
     public bool $isService;//是否服务商
@@ -50,7 +49,6 @@ class Entity
             }
         }
 
-        $this->apiKey = $svConf['apiKey'];
         $this->apiV3Key = $svConf['v3Key'];
         $this->certSerial = $svConf['certSerial'];
         $this->certPath = $svConf['certPath'] ?? null;
