@@ -24,11 +24,9 @@ class Entity
      *
      * Entity constructor.
      * @param array $conf
-     * @param string|null $certPath
      */
-    public function __construct(array $conf, string $certPath = null)
+    public function __construct(array $conf)
     {
-        if ($certPath) $conf['certPath'] = $certPath;
         $this->isService = boolval($conf['service'] ?? 1);
         $this->reConfig($conf);
     }
@@ -49,13 +47,16 @@ class Entity
             }
         }
 
-        $this->apiV3Key = $svConf['v3Key'];
-        $this->certSerial = $svConf['certSerial'];
-        $this->certPath = $svConf['certPath'] ?? null;
-
-        if (!isset($this->certPath)) {
-            $this->certPath = defined('_CERT') ? _CERT : (_ROOT . '/cert');
+        $this->apiV3Key = $svConf['v3Key'] ?? '';
+        $this->certSerial = $svConf['certSerial'] ?? '';
+        if (isset($svConf['certPath'])) {
+            $this->certPath = $svConf['certPath'];
+        } else if (defined('_CERT')) {
+            $this->certPath = _CERT;
+        } else {
+            $this->certPath = (_ROOT . '/cert');
         }
+
         if (!$this->certPath) throw new Error('未指定证书目录');
         $this->certPath = rtrim($this->certPath, '/');
 
