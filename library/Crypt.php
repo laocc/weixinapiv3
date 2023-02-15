@@ -19,15 +19,13 @@ class Crypt
 
     public function __construct(string $certSerial, string $certPath = null)
     {
-        if (is_null($certPath)) $certPath = defined('_CERT') ? _CERT : null;
+        if (is_null($certPath)) $certPath = defined('_CERT_PUB') ? _CERT_PUB : null;
         if (!$certPath) throw new Error('未指定证书目录');
         $certPath = rtrim($certPath, '/');
-
         $this->serial = $certSerial;
-        $cert = $certPath . "/{$certSerial}/cert.pem";
-        $pub = $certPath . "/{$certSerial}/public.pem";
-        $this->cert = openssl_get_privatekey(file_get_contents($cert));
-        $this->public = openssl_get_publickey(file_get_contents($pub));
+        if (!is_readable("{$certPath}/{$certSerial}")) throw new Error("证书目录{$certPath}/{$certSerial}不存在或不可读");
+        $this->cert = openssl_get_privatekey(file_get_contents("{$certPath}/{$certSerial}/cert.pem"));
+        $this->public = openssl_get_publickey(file_get_contents("{$certPath}/{$certSerial}/public.pem"));
     }
 
     public function serial()

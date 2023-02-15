@@ -15,7 +15,8 @@ class Entity
     public string $apiV3Key;
     public string $certSerial;
     public bool $isService;//是否服务商
-    public string $certPath;
+    public string $privatePath;
+    public string $publicPath;
 
     public $certEncrypt;
 
@@ -49,23 +50,26 @@ class Entity
 
         $this->apiV3Key = $svConf['v3Key'] ?? '';
         $this->certSerial = $svConf['certSerial'] ?? '';
-        if (isset($svConf['certPath'])) {
-            $this->certPath = $svConf['certPath'];
-        } else if (defined('_CERT')) {
-            $this->certPath = _CERT;
+
+        if (isset($svConf['cert'])) {
+            $this->privatePath = $svConf['private'];
+            $this->publicPath = $svConf['public'];
         } else {
-            $this->certPath = (_ROOT . '/cert');
+            if (defined('_CERT_PRI')) $this->privatePath = _CERT_PRI;
+            if (defined('_CERT_PUB')) $this->publicPath = _CERT_PUB;
         }
 
-        if (!$this->certPath) throw new Error('未指定证书目录');
-        $this->certPath = rtrim($this->certPath, '/');
+        if (!$this->privatePath) throw new Error('未指定商户私钥证书目录');
+        if (!$this->publicPath) throw new Error('未指定微信公钥证书目录');
+        $this->privatePath = rtrim($this->privatePath, '/');
+        $this->publicPath = rtrim($this->publicPath, '/');
 
         /**
          * 这里用到的密钥是在微信支付后台申请的
          */
-        $cert = $this->certPath . "/{$this->certSerial}/apiclient_key.pem";
+        $cert = $this->privatePath . "/{$this->certSerial}/apiclient_key.pem";
         if (!is_readable($cert)) {
-            $cert = $this->certPath . "/{$this->mchID}/apiclient_key.pem";
+            $cert = $this->privatePath . "/{$this->mchID}/apiclient_key.pem";
             if (!is_readable($cert)) throw new Error("商户证书文件不存在，请检查");
         }
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));

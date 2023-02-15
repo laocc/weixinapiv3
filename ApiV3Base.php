@@ -136,11 +136,11 @@ abstract class ApiV3Base extends Library
         $header = $request->header();
         $json = $request->html();
 
-        $cert = $this->entity->certPath . "/{$header['WECHATPAY-SERIAL']}/public.pem";
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
         if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
+            $cert = "{$this->entity->publicPath}/{$header['WECHATPAY-SERIAL']}/public.pem";
             $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
         }
         $signature = \base64_decode($header['WECHATPAY-SIGNATURE']);
