@@ -20,7 +20,7 @@ class Certificates extends ApiV3Base
      */
     public function downloadPlatCert(string $apiV3Key)
     {
-        $Certificates = $this->get("/v3/certificates");
+        $Certificates = $this->signCheck(false)->get("/v3/certificates");
         if (is_string($Certificates)) return $Certificates;
         foreach ($Certificates['data'] as &$cert) {
             $cert['cert'] = $this->decryptToString($apiV3Key,
