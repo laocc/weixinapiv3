@@ -100,7 +100,7 @@ class Pay extends ApiV3Base
             $data['mchid'] = $this->entity->mchID;
         }
 
-        $data['description'] = $params['description'];
+        $data['description'] = $params['subject'] ?? $params['description'];
         $data['out_trade_no'] = strval($params['number']);
         $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 60));
         $data['attach'] = $params['attach'];

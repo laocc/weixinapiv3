@@ -21,12 +21,9 @@ class Pay extends ApiV3Base
         $data = [];
         $data['sp_appid'] = $this->entity->appID;
         $data['sp_mchid'] = $this->entity->mchID;
-
-//        $data['sub_appid'] = $params['appID'];
         $data['sub_mchid'] = $params['mchID'];
-
-        $data['description'] = $params['subject'];
-        $data['out_trade_no'] = $params['id'];
+        $data['description'] = $params['subject'] ?? $params['description'];
+        $data['out_trade_no'] = strval($params['number']);
         $data['time_expire'] = date(DATE_RFC3339, $time);
         $data['attach'] = $params['attach'];
         $data['notify_url'] = $params['notify'];
