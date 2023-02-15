@@ -52,8 +52,8 @@ class Entity
         $this->certSerial = $svConf['certSerial'] ?? '';
 
         if (isset($svConf['cert'])) {
-            $this->privatePath = $svConf['private'];
-            $this->publicPath = $svConf['public'];
+            $this->privatePath = $svConf['cert']['private'];
+            $this->publicPath = $svConf['cert']['public'];
         } else {
             if (defined('_CERT_PRI')) $this->privatePath = _CERT_PRI;
             if (defined('_CERT_PUB')) $this->publicPath = _CERT_PUB;
