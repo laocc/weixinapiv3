@@ -213,7 +213,7 @@ abstract class ApiV3Base extends Library
         if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
-            $cert = $this->entity->certPath . "/{$serial}/public.pem";
+            $cert = "{$this->entity->publicPath}/{$serial}/public.pem";
             $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
         }
         $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
