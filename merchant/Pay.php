@@ -20,7 +20,7 @@ class Pay extends ApiV3Base
         $time = time();
         $data = [];
 
-        if ($this->entity->isService) {
+        if ($this->entity->service > 1) {
             $data['sp_appid'] = $this->entity->appID;
             $data['sp_mchid'] = $this->entity->mchID;
 
@@ -47,7 +47,7 @@ class Pay extends ApiV3Base
         $data['amount']['total'] = $params['fee'];
         $data['amount']['currency'] = 'CNY';
 
-        if ($this->entity->isService) {
+        if ($this->entity->service > 1) {
             $unified = $this->post("/v3/pay/partner/transactions/app", $data);
         } else {
             $unified = $this->post("/v3/pay/transactions/app", $data);
@@ -76,7 +76,7 @@ class Pay extends ApiV3Base
 
     /**
      * 发起公众号、小程序支付
-     * 服务商和直连都可用，取决于 $this->entity->isService
+     * 服务商和直连都可用，取决于 $this->entity->service
      *
      * @param array $params
      * @return array|string
@@ -86,7 +86,7 @@ class Pay extends ApiV3Base
         $time = time();
         $data = [];
 
-        if ($this->entity->isService) {
+        if ($this->entity->service > 1) {
             $data['sp_appid'] = $this->entity->appID;
             $data['sp_mchid'] = $this->entity->mchID;
 
@@ -114,7 +114,7 @@ class Pay extends ApiV3Base
         $data['amount']['currency'] = 'CNY';
 
         $data['payer'] = [];
-        if ($this->entity->isService) {
+        if ($this->entity->service > 1) {
             if (isset($params['appID'])) {
                 $data['payer']['sub_openid'] = $params['openid'];
             } else {

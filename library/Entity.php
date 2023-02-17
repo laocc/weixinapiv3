@@ -14,9 +14,9 @@ class Entity
     public string $appID;
     public string $apiV3Key;
     public string $certSerial;
-    public bool $isService;//是否服务商
-    public string $privatePath;
-    public string $publicPath;
+    public string $privatePath = '';
+    public string $publicPath = '';
+    public int $service;//服务商类型，1直连商户，2普通服务商，4电商服务商
 
     public $certEncrypt;
 
@@ -28,32 +28,24 @@ class Entity
      */
     public function __construct(array $conf)
     {
-        $this->isService = boolval($conf['service'] ?? 1);
-        $this->reConfig($conf);
-    }
+        $this->service = intval($conf['service'] ?? 0);
 
-    /**
-     * @param array $svConf
-     * @return $this
-     */
-    public function reConfig(array $svConf): Entity
-    {
-        if (!isset($svConf['mchID'])) throw new Error("传入数据需要含有微信支付商户基本数据结构");
+        if (!isset($conf['mchID'])) throw new Error("传入数据需要含有微信支付商户基本数据结构");
 
-        $this->mchID = $svConf['mchID'] ?? ($svConf['mchid'] ?? '');
+        $this->mchID = $conf['mchID'] ?? ($conf['mchid'] ?? '');
         foreach (['appID', 'appid', 'miniAppID', 'mppAppID', 'appId'] as $ak) {
-            if (isset($svConf[$ak])) {
-                $this->appID = $svConf[$ak];
+            if (isset($conf[$ak])) {
+                $this->appID = $conf[$ak];
                 break;
             }
         }
 
-        $this->apiV3Key = $svConf['v3Key'] ?? '';
-        $this->certSerial = $svConf['certSerial'] ?? '';
+        $this->apiV3Key = $conf['v3Key'] ?? '';
+        $this->certSerial = $conf['certSerial'] ?? '';
 
-        if (isset($svConf['cert'])) {
-            $this->privatePath = $svConf['cert']['private'] ?? '';
-            $this->publicPath = $svConf['cert']['public'] ?? '';
+        if (isset($conf['cert'])) {
+            $this->privatePath = $conf['cert']['private'] ?? '';
+            $this->publicPath = $conf['cert']['public'] ?? '';
         } else {
             if (defined('_CERT')) {
                 if (is_string(_CERT)) {
@@ -72,7 +64,7 @@ class Entity
         $this->publicPath = rtrim($this->publicPath, '/');
 
         /**
-         * 这里用到的密钥是在微信支付后台申请的
+         * 这里用到的密钥是在微信支付后台申请的商户私钥，或服务商私钥
          */
         $cert = "{$this->privatePath}/{$this->certSerial}/apiclient_key.pem";
         if (!is_readable($cert)) {
@@ -80,7 +72,6 @@ class Entity
             if (!is_readable($cert)) throw new Error("商户证书文件不存在，请检查");
         }
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));
-        return $this;
     }
 
     public function __toString()
