@@ -77,14 +77,14 @@ class Pay extends ApiV3Base implements PayFace
         $param = [];
         $param['sp_mchid'] = $this->entity->mchID;
         $param['sub_mchid'] = $params['mchID'];
-        if (empty($params['number'] ?? '') and empty($params['transaction_id'] ?? '')) {
+        if (empty($params['number'] ?? '') and empty($params['waybill'] ?? '')) {
             return '商户订单号或微信订单号至少要提供一个';
         }
 
-        if (empty($params['transaction_id'])) {
+        if (empty($params['waybill'])) {
             $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$params['number']}", $param);
         } else {
-            $data = $this->get("/v3/pay/partner/transactions/id/{$params['transaction_id']}", $param);
+            $data = $this->get("/v3/pay/partner/transactions/id/{$params['waybill']}", $param);
         }
         if (is_string($data)) return $data;
 
