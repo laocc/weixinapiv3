@@ -19,7 +19,16 @@ class Crypt
 
     public function __construct(string $certSerial, string $certPath = null)
     {
-        if (is_null($certPath)) $certPath = defined('_CERT_PUB') ? _CERT_PUB : null;
+        if (is_null($certPath)) {
+            $certPath = '';
+            if (defined('_CERT')) {
+                if (is_string(_CERT)) {
+                    $certPath = _CERT;
+                } else {
+                    $certPath = _CERT['public'] ?? '';
+                }
+            }
+        }
         if (!$certPath) throw new Error('未指定证书目录');
         $certPath = rtrim($certPath, '/');
         $this->serial = $certSerial;

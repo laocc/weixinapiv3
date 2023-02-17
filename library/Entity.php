@@ -41,7 +41,7 @@ class Entity
         if (!isset($svConf['mchID'])) throw new Error("传入数据需要含有微信支付商户基本数据结构");
 
         $this->mchID = $svConf['mchID'] ?? ($svConf['mchid'] ?? '');
-        foreach (['appID', 'appid', 'miniAppID', 'mppAppID'] as $ak) {
+        foreach (['appID', 'appid', 'miniAppID', 'mppAppID', 'appId'] as $ak) {
             if (isset($svConf[$ak])) {
                 $this->appID = $svConf[$ak];
                 break;
@@ -52,24 +52,31 @@ class Entity
         $this->certSerial = $svConf['certSerial'] ?? '';
 
         if (isset($svConf['cert'])) {
-            $this->privatePath = $svConf['cert']['private'];
-            $this->publicPath = $svConf['cert']['public'];
+            $this->privatePath = $svConf['cert']['private'] ?? '';
+            $this->publicPath = $svConf['cert']['public'] ?? '';
         } else {
-            if (defined('_CERT_PRI')) $this->privatePath = _CERT_PRI;
-            if (defined('_CERT_PUB')) $this->publicPath = _CERT_PUB;
+            if (defined('_CERT')) {
+                if (is_string(_CERT)) {
+                    $this->privatePath = _CERT;
+                    $this->publicPath = _CERT;
+                } else {
+                    $this->privatePath = _CERT['private'] ?? '';
+                    $this->publicPath = _CERT['public'] ?? '';
+                }
+            }
         }
-
         if (!$this->privatePath) throw new Error('未指定商户私钥证书目录');
         if (!$this->publicPath) throw new Error('未指定微信公钥证书目录');
+
         $this->privatePath = rtrim($this->privatePath, '/');
         $this->publicPath = rtrim($this->publicPath, '/');
 
         /**
          * 这里用到的密钥是在微信支付后台申请的
          */
-        $cert = $this->privatePath . "/{$this->certSerial}/apiclient_key.pem";
+        $cert = "{$this->privatePath}/{$this->certSerial}/apiclient_key.pem";
         if (!is_readable($cert)) {
-            $cert = $this->privatePath . "/{$this->mchID}/apiclient_key.pem";
+            $cert = "{$this->privatePath}/{$this->mchID}/apiclient_key.pem";
             if (!is_readable($cert)) throw new Error("商户证书文件不存在，请检查");
         }
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));
