@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay\ecommerce;
+namespace laocc\weiPay\ecommerce;
 
-use esp\weiPay\ApiV3Base;
+use laocc\weiPay\ApiV3Base;
 
 class Bill extends ApiV3Base
 {

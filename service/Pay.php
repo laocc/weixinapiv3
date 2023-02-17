@@ -1,13 +1,24 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay\service;
+namespace laocc\weiPay\service;
 
-use esp\weiPay\ApiV3Base;
+use laocc\weiPay\ApiV3Base;
+use laocc\weiPay\library\PayFace;
 use function esp\helper\str_rand;
 
-class Pay extends ApiV3Base
+class Pay extends ApiV3Base implements PayFace
 {
+    public function app(array $params)
+    {
+        // TODO: Implement app() method.
+    }
+
+    public function h5(array $params)
+    {
+        // TODO: Implement h5() method.
+    }
+
     /**
      * 发起公众号、小程序支付
      * @param array $params
@@ -56,36 +67,39 @@ class Pay extends ApiV3Base
 
 
     /**
-     * @param array $option
+     * @param array $params
      * @return array|string
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter4_5_2.shtml
      */
-    public function query(array $option)
+    public function query(array $params)
     {
         $param = [];
         $param['sp_mchid'] = $this->entity->mchID;
-        $param['sub_mchid'] = $option['mchID'];
-        if (empty($option['number'] ?? '') and empty($option['transaction_id'] ?? '')) {
+        $param['sub_mchid'] = $params['mchID'];
+        if (empty($params['number'] ?? '') and empty($params['transaction_id'] ?? '')) {
             return '商户订单号或微信订单号至少要提供一个';
         }
 
-        if (empty($option['transaction_id'])) {
-            $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$option['number']}", $param);
+        if (empty($params['transaction_id'])) {
+            $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$params['number']}", $param);
         } else {
-            $data = $this->get("/v3/pay/partner/transactions/id/{$option['transaction_id']}", $param);
+            $data = $this->get("/v3/pay/partner/transactions/id/{$params['transaction_id']}", $param);
         }
         if (is_string($data)) return $data;
 
-        $value = [
+        return [
             'mchid' => $data['sub_mchid'],
             'number' => $data['out_trade_no'],
             'state' => $data['trade_state'],
             'transaction' => $data['transaction_id'] ?? '',
             'time' => strtotime($data['success_time'] ?? ''),
         ];
+    }
 
-        return $value;
+    public function refund(array $params)
+    {
+        // TODO: Implement refund() method.
     }
 
 

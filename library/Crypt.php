@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay\library;
+namespace laocc\weiPay\library;
 
 use esp\error\Error;
 
@@ -9,7 +9,7 @@ use esp\error\Error;
  * 数据加解密
  *
  * Class Crypt
- * @package esp\weiPay\library
+ * @package laocc\weiPay\library
  */
 class Crypt
 {

@@ -1,12 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay\merchant;
+namespace laocc\weiPay\merchant;
 
-use esp\weiPay\ApiV3Base;
+use laocc\weiPay\ApiV3Base;
+use laocc\weiPay\library\PayFace;
 use function esp\helper\str_rand;
 
-class Pay extends ApiV3Base
+class Pay extends ApiV3Base implements PayFace
 {
 
     /**
@@ -73,6 +74,10 @@ class Pay extends ApiV3Base
         return $value;
     }
 
+    public function h5(array $params)
+    {
+        // TODO: Implement h5() method.
+    }
 
     /**
      * 发起公众号、小程序支付
@@ -143,15 +148,15 @@ class Pay extends ApiV3Base
     }
 
 
-    public function query(array $option)
+    public function query(array $params)
     {
         $param = [];
         $param['mchid'] = $this->entity->mchID;
 
-        if ($option['transaction_id'] ?? '') {
-            $data = $this->get("/v3/pay/transactions/id/{$option['transaction_id']}", $param);
-        } else if ($option['out_trade_no'] ?? '') {
-            $data = $this->get("/v3/pay/transactions/out-trade-no/{$option['out_trade_no']}", $param);
+        if ($params['transaction_id'] ?? '') {
+            $data = $this->get("/v3/pay/transactions/id/{$params['transaction_id']}", $param);
+        } else if ($params['out_trade_no'] ?? '') {
+            $data = $this->get("/v3/pay/transactions/out-trade-no/{$params['out_trade_no']}", $param);
         } else {
             return "商户订单号或通道订单号至少要填1项";
         }
@@ -161,18 +166,18 @@ class Pay extends ApiV3Base
     }
 
 
-    public function refund(array $option)
+    public function refund(array $params)
     {
         $param = [];
-        $param['transaction_id'] = $option['transaction_id'];
-        $param['out_trade_no'] = $option['out_trade_no'];
-        $param['out_refund_no'] = $option['out_refund_no'];
-        $param['reason'] = $option['out_refund_no'] ?? '用户要求退款';
-        $param['notify_url'] = $option['notify'];
+        $param['transaction_id'] = $params['transaction_id'];
+        $param['out_trade_no'] = $params['out_trade_no'];
+        $param['out_refund_no'] = $params['out_refund_no'];
+        $param['reason'] = $params['out_refund_no'] ?? '用户要求退款';
+        $param['notify_url'] = $params['notify'];
 //        $param['funds_account'] = 'AVAILABLE';
         $param['amount'] = [
-            'refund' => $option['refund'] ?? $option['total'],
-            'total' => $option['total'],
+            'refund' => $params['refund'] ?? $params['total'],
+            'total' => $params['total'],
             'currency' => 'CNY',
         ];
 

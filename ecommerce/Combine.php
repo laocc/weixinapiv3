@@ -1,10 +1,10 @@
 <?php
 
-namespace esp\weiPay\ecommerce;
+namespace laocc\weiPay\ecommerce;
 
 
 use function esp\helper\str_rand;
-use esp\weiPay\ApiV3Base;
+use laocc\weiPay\ApiV3Base;
 
 class Combine extends ApiV3Base
 {

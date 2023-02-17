@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay\auto;
+namespace laocc\weiPay\auto;
 
-use esp\weiPay\ApiV3Base;
+use laocc\weiPay\ApiV3Base;
 
 final class Certificates extends ApiV3Base
 {

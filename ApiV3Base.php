@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay;
+namespace laocc\weiPay;
 
 use esp\core\Library;
 use esp\http\Http;
-use esp\weiPay\library\Crypt;
-use esp\weiPay\library\Entity;
+use laocc\weiPay\library\Crypt;
+use laocc\weiPay\library\Entity;
 
 abstract class ApiV3Base extends Library
 {

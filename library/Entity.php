@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay\library;
+namespace laocc\weiPay\library;
 
 use esp\error\Error;
 

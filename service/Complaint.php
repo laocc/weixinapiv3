@@ -1,9 +1,9 @@
 <?php
 
-namespace esp\weiPay\service;
+namespace laocc\weiPay\service;
 
 
-use esp\weiPay\ApiV3Base;
+use laocc\weiPay\ApiV3Base;
 
 class Complaint extends ApiV3Base
 {

@@ -1,10 +1,9 @@
 <?php
 declare(strict_types=1);
 
+namespace laocc\weiPay\ecommerce;
 
-namespace esp\weiPay\ecommerce;
-
-use esp\weiPay\ApiV3Base;
+use laocc\weiPay\ApiV3Base;
 
 class Account extends ApiV3Base
 {

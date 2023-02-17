@@ -1,13 +1,24 @@
 <?php
 declare(strict_types=1);
 
-namespace esp\weiPay\ecommerce;
+namespace laocc\weiPay\ecommerce;
 
-use esp\weiPay\ApiV3Base;
+use laocc\weiPay\ApiV3Base;
+use laocc\weiPay\library\PayFace;
 use function esp\helper\str_rand;
 
-class Pay extends ApiV3Base
+class Pay extends ApiV3Base implements PayFace
 {
+    public function app(array $params)
+    {
+        // TODO: Implement app() method.
+    }
+
+    public function h5(array $params)
+    {
+        // TODO: Implement h5() method.
+    }
+
     /**
      * 发起公众号、小程序支付
      * @param array $params
@@ -58,32 +69,32 @@ class Pay extends ApiV3Base
 
 
     /**
-     * @param string $ordNumber
-     * @param string $mchID
+     * @param array $params
      * @return array|string
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter7_2_5.shtml
      */
-    public function query(string $ordNumber, string $mchID)
+    public function query(array $params)
     {
         $param = [];
         $param['sp_mchid'] = $this->entity->mchID;
-        $param['sub_mchid'] = $mchID;
+        $param['sub_mchid'] = $params['mchID'];
 
-        $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$ordNumber}", $param);
+        $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$params['number']}", $param);
         if (is_string($data)) return $data;
-        $values = [];
 
-        $values[] = [
+        return [
             'number' => $data['out_trade_no'],
             'state' => $data['trade_state'],
             'desc' => $data['trade_state_desc'],
             'transaction' => $data['transaction_id'] ?? '',
             'time' => strtotime($data['success_time'] ?? ''),
         ];
-
-        return $values;
     }
 
+    public function refund(array $params)
+    {
+        // TODO: Implement refund() method.
+    }
 
 }
