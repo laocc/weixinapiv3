@@ -92,8 +92,9 @@ class Pay extends ApiV3Base implements PayFace
             'mchid' => $data['sub_mchid'],
             'number' => $data['out_trade_no'],
             'state' => $data['trade_state'],
-            'transaction' => $data['transaction_id'] ?? '',
+            'waybill' => $data['transaction_id'] ?? '',
             'time' => strtotime($data['success_time'] ?? ''),
+            'data' => $data,
         ];
     }
 

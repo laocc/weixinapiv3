@@ -148,6 +148,10 @@ class Pay extends ApiV3Base implements PayFace
     }
 
 
+    /**
+     * @param array $params
+     * @return array|\esp\http\HttpResult|mixed|string|null
+     */
     public function query(array $params)
     {
         $param = [];
@@ -162,7 +166,14 @@ class Pay extends ApiV3Base implements PayFace
         }
         if (is_string($data)) return $data;
 
-        return $data;
+        return [
+            'mchid' => $data['mchid'],
+            'number' => $data['out_trade_no'],
+            'state' => $data['trade_state'],
+            'waybill' => $data['transaction_id'] ?? '',
+            'time' => strtotime($data['success_time'] ?? ''),
+            'data' => $data,
+        ];
     }
 
 
