@@ -10,7 +10,7 @@ class Refund extends ApiV3Base
     public function notify(array $post): array
     {
         $params = [];
-        $params['success'] = $post['refund_status'] === 'SUCCESS';
+        $params['success'] = ($post['refund_status'] ?? $post['status']) === 'SUCCESS';
         $params['waybill'] = $post['refund_id'];
         $params['number'] = $post['out_refund_no'];
         $params['time'] = strtotime($post['success_time']);
