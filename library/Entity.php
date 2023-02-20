@@ -44,7 +44,7 @@ class Entity
             }
         }
 
-        if (isset($conf['shopID'])) $this->shopMchID = $conf['shopID'];
+        if (isset($conf['shopMchID'])) $this->shopMchID = $conf['shopMchID'];
         if (isset($conf['shopAppID'])) $this->shopAppID = $conf['shopAppID'];
 
         $this->apiV3Key = $conf['v3Key'] ?? '';
