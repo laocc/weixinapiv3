@@ -15,7 +15,7 @@ class Pay extends ApiV3Base
         $params['waybill'] = $value['transaction_id'];
         $params['time'] = strtotime($value['success_time']);
         $params['state'] = strtolower(substr($value['trade_state'], -20));
-        $params['fee'] = intval($value['amount']['total']);
+        $params['amount'] = intval($value['amount']['total']);
         return $params;
     }
 

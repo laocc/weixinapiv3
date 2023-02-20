@@ -33,7 +33,15 @@ class Refund extends ApiV3Base
             $rest = $this->get("/v3/ecommerce/refunds/out-refund-no/{$param['number']}", $data);
         }
         if (is_string($rest)) return $rest;
-        return $rest;
+
+        return [
+            'success' => ($data['status'] === 'SUCCESS'),
+            'status' => $data['status'],
+            'waybill' => $data['refund_id'],
+            'number' => $data['out_refund_no'],
+            'time' => strtotime($data['success_time']),
+            'amount' => intval($data['amount']['payer_refund']),
+        ];
     }
 
 
