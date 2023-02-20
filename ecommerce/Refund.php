@@ -7,7 +7,7 @@ use laocc\weiPay\ApiV3Base;
 
 class Refund extends ApiV3Base
 {
-    public function apply(array $refDataAll)
+    public function send(array $refDataAll)
     {
         $value = [];
 

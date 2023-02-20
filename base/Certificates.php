@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace laocc\weiPay\auto;
+namespace laocc\weiPay\base;
 
 use laocc\weiPay\ApiV3Base;
 

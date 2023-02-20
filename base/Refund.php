@@ -1,18 +1,18 @@
 <?php
-declare(strict_types=1);
 
-namespace laocc\weiPay\service;
+namespace laocc\weiPay\base;
 
 use laocc\weiPay\ApiV3Base;
 
 class Refund extends ApiV3Base
 {
 
-
     public function query(array $param)
     {
         $data = [];
-        $data['sub_mchid'] = $param['mchid'];
+        if ($this->entity->service > 1) {
+            $data['sub_mchid'] = $this->entity->shopMchID;
+        }
 
         if (isset($param['transaction']) and !empty($param['transaction'])) {
             $rest = $this->get("/v3/ecommerce/refunds/id/{$param['transaction']}", $data);
@@ -34,7 +34,9 @@ class Refund extends ApiV3Base
     public function send(array $refund)
     {
         $param = [];
-        $param['sub_mchid'] = $refund['mchid'];
+        if ($this->entity->service > 1) {
+            $data['sub_mchid'] = $this->entity->shopMchID;
+        }
 
         $param['transaction_id'] = $refund['transaction_id'];
         $param['out_trade_no'] = $refund['out_trade_no'];
@@ -56,6 +58,4 @@ class Refund extends ApiV3Base
             'amount' => intval($data['amount']['payer_refund']),
         ];
     }
-
-
 }

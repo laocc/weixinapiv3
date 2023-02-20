@@ -16,6 +16,10 @@ class Entity
     public string $certSerial;
     public string $privatePath = '';
     public string $publicPath = '';
+
+    public string $shopMchID = '';//子商户
+    public string $shopAppID = '';
+
     public int $service;//服务商类型，1直连商户，2普通服务商，4电商服务商
 
     public $certEncrypt;
@@ -39,6 +43,9 @@ class Entity
                 break;
             }
         }
+
+        if (isset($conf['shopID'])) $this->shopMchID = $conf['shopID'];
+        if (isset($conf['shopAppID'])) $this->shopAppID = $conf['shopAppID'];
 
         $this->apiV3Key = $conf['v3Key'] ?? '';
         $this->certSerial = $conf['certSerial'] ?? '';

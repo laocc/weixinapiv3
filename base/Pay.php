@@ -1,13 +1,11 @@
 <?php
-declare(strict_types=1);
 
-namespace laocc\weiPay\merchant;
+namespace laocc\weiPay\base;
 
 use laocc\weiPay\ApiV3Base;
-use laocc\weiPay\library\PayFace;
 use function esp\helper\str_rand;
 
-class Pay extends ApiV3Base implements PayFace
+class Pay extends ApiV3Base
 {
 
     /**
@@ -24,12 +22,8 @@ class Pay extends ApiV3Base implements PayFace
         if ($this->entity->service > 1) {
             $data['sp_appid'] = $this->entity->appID;
             $data['sp_mchid'] = $this->entity->mchID;
-
-            if (isset($params['appID'])) {
-                //用子商户的appid
-                $data['sub_appid'] = $params['appID'];
-            }
-            $data['sub_mchid'] = $params['mchID'];
+            $data['sub_appid'] = $this->entity->shopAppID;
+            $data['sub_mchid'] = $this->entity->shopMchID;
         } else {
             $data['appid'] = $this->entity->appID;
             $data['mchid'] = $this->entity->mchID;
@@ -74,11 +68,6 @@ class Pay extends ApiV3Base implements PayFace
         return $value;
     }
 
-    public function h5(array $params)
-    {
-        // TODO: Implement h5() method.
-    }
-
     /**
      * 发起公众号、小程序支付
      * 服务商和直连都可用，取决于 $this->entity->service
@@ -94,12 +83,8 @@ class Pay extends ApiV3Base implements PayFace
         if ($this->entity->service > 1) {
             $data['sp_appid'] = $this->entity->appID;
             $data['sp_mchid'] = $this->entity->mchID;
-
-            if (isset($params['appID'])) {
-                //用子商户的appid
-                $data['sub_appid'] = $params['appID'];
-            }
-            $data['sub_mchid'] = $params['mchID'];
+            $data['sub_appid'] = $this->entity->shopAppID;
+            $data['sub_mchid'] = $this->entity->shopMchID;
         } else {
             $data['appid'] = $this->entity->appID;
             $data['mchid'] = $this->entity->mchID;
@@ -119,12 +104,9 @@ class Pay extends ApiV3Base implements PayFace
         $data['amount']['currency'] = 'CNY';
 
         $data['payer'] = [];
-        if ($this->entity->service > 1) {
-            if (isset($params['appID'])) {
-                $data['payer']['sub_openid'] = $params['openid'];
-            } else {
-                $data['payer']['sp_openid'] = $params['openid'];
-            }
+        if ($this->entity->service > 1) {//服务商
+            $data['payer']['sub_openid'] = $params['openid'];
+//            $data['payer']['sp_openid'] = $params['openid'];//与sub_openid二选一
             $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
         } else {
             $data['payer']['openid'] = $params['openid'];
@@ -147,6 +129,11 @@ class Pay extends ApiV3Base implements PayFace
         return $values;
     }
 
+    public function h5(array $params)
+    {
+        // TODO: Implement h5() method.
+    }
+
 
     /**
      * @param array $params
@@ -155,12 +142,20 @@ class Pay extends ApiV3Base implements PayFace
     public function query(array $params)
     {
         $param = [];
-        $param['mchid'] = $this->entity->mchID;
+        if ($this->entity->service > 1) {
+            $param['sp_mchid'] = $this->entity->mchID;
+            $param['sub_mchid'] = $this->entity->shopID;
+            $api = '/partner';
+        } else {
+            $param['mchid'] = $this->entity->mchID;
+            $api = '';
+        }
 
         if ($params['waybill'] ?? '') {
-            $data = $this->get("/v3/pay/transactions/id/{$params['waybill']}", $param);
+            $data = $this->get("/v3/pay{$api}/transactions/id/{$params['waybill']}", $param);
         } else if ($params['number'] ?? '') {
-            $data = $this->get("/v3/pay/transactions/out-trade-no/{$params['number']}", $param);
+            $data = $this->get("/v3/pay{$api}/transactions/out-trade-no/{$params['number']}", $param);
+
         } else {
             return "商户订单号或通道订单号至少要填1项";
         }
@@ -175,6 +170,5 @@ class Pay extends ApiV3Base implements PayFace
             'data' => $data,
         ];
     }
-
 
 }

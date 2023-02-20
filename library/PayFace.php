@@ -12,5 +12,5 @@ interface PayFace
 
     public function query(array $params);
 
-    public function refund(array $params);
+//    public function refund(array $params);
 }

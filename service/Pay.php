@@ -98,10 +98,5 @@ class Pay extends ApiV3Base implements PayFace
         ];
     }
 
-    public function refund(array $params)
-    {
-        // TODO: Implement refund() method.
-    }
-
 
 }
