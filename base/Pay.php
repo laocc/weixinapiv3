@@ -8,6 +8,18 @@ use function esp\helper\str_rand;
 class Pay extends ApiV3Base
 {
 
+    public function notify(array $value): array
+    {
+        $params = [];
+        $params['success'] = $value['trade_state'] === 'SUCCESS';
+        $params['waybill'] = $value['transaction_id'];
+        $params['time'] = strtotime($value['success_time']);
+        $params['state'] = strtolower(substr($value['trade_state'], -20));
+        $params['fee'] = intval($value['amount']['total']);
+        return $params;
+    }
+
+
     /**
      * app支付
      *
@@ -144,7 +156,7 @@ class Pay extends ApiV3Base
         $param = [];
         if ($this->entity->service > 1) {
             $param['sp_mchid'] = $this->entity->mchID;
-            $param['sub_mchid'] = $this->entity->shopID;
+            $param['sub_mchid'] = $this->entity->shopMchID;
             $api = '/partner';
         } else {
             $param['mchid'] = $this->entity->mchID;

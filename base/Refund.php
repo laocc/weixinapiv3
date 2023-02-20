@@ -7,6 +7,19 @@ use laocc\weiPay\ApiV3Base;
 class Refund extends ApiV3Base
 {
 
+    public function notify(array $post): array
+    {
+        $params = [];
+        $params['success'] = $post['refund_status'] === 'SUCCESS';
+        $params['waybill'] = $post['refund_id'];
+        $params['number'] = $post['out_refund_no'];
+        $params['time'] = strtotime($post['success_time']);
+        $params['state'] = strtolower(substr($post['refund_status'], -20));
+        $params['amount'] = intval($post['amount']['refund']);
+        return $params;
+    }
+
+
     public function query(array $param)
     {
         $data = [];
