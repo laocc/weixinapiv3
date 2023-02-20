@@ -38,9 +38,9 @@ class Refund extends ApiV3Base
             $data['sub_mchid'] = $this->entity->shopMchID;
         }
 
-        $param['transaction_id'] = $refund['transaction_id'];
-        $param['out_trade_no'] = $refund['out_trade_no'];
-        $param['out_refund_no'] = $refund['out_refund_no'];
+        $param['transaction_id'] = $refund['waybill'];//微信订单号
+        $param['out_trade_no'] = $refund['number'];//商户支付单号
+        $param['out_refund_no'] = $refund['refund'];//退款订单号
         $param['reason'] = $refund['reason'];
         $param['notify_url'] = $refund['notify'];
         $param['amount'] = [];
