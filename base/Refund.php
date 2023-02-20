@@ -23,15 +23,12 @@ class Refund extends ApiV3Base
     public function query(array $param)
     {
         $data = [];
+
         if ($this->entity->service > 1) {
             $data['sub_mchid'] = $this->entity->shopMchID;
         }
 
-        if (isset($param['transaction']) and !empty($param['transaction'])) {
-            $rest = $this->get("/v3/ecommerce/refunds/id/{$param['transaction']}", $data);
-        } else {
-            $rest = $this->get("/v3/ecommerce/refunds/out-refund-no/{$param['number']}", $data);
-        }
+        $rest = $this->get("/v3/refund/domestic/refunds/{$param['number']}", $data);
         if (is_string($rest)) return $rest;
 
         return [
