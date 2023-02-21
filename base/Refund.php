@@ -9,7 +9,7 @@ class Refund extends ApiV3Base
 
     public function notify(array $post)
     {
-        if (!isset($post['refund_id'])) return $post['message'];
+        if (!isset($post['refund_id'])) return json_encode($post, 320);
         $params = [];
         $params['success'] = ($post['refund_status'] ?? $post['status']) === 'SUCCESS';
         $params['waybill'] = $post['refund_id'];
