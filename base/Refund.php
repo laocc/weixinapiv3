@@ -31,14 +31,15 @@ class Refund extends ApiV3Base
 
         $rest = $this->get("/v3/refund/domestic/refunds/{$param['number']}", $data);
         if (is_string($rest)) return $rest;
+        $this->debug($rest);
 
         return [
-            'success' => ($data['status'] === 'SUCCESS'),
-            'status' => $data['status'],
-            'waybill' => $data['refund_id'],
-            'number' => $data['out_refund_no'],
-            'time' => strtotime($data['success_time']),
-            'amount' => intval($data['amount']['payer_refund']),
+            'success' => ($rest['status'] === 'SUCCESS'),
+            'status' => $rest['status'],
+            'waybill' => $rest['refund_id'],
+            'number' => $rest['out_refund_no'],
+            'time' => strtotime($rest['success_time']),
+            'amount' => intval($rest['amount']['payer_refund']),
         ];
     }
 
