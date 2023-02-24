@@ -35,7 +35,7 @@ class Refund extends ApiV3Base
 
         return [
             'success' => ($rest['status'] === 'SUCCESS'),
-            'status' => $rest['status'],
+            'state' => $rest['status'],
             'waybill' => $rest['refund_id'],
             'number' => $rest['out_refund_no'],
             'time' => strtotime($rest['success_time']),
