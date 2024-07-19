@@ -30,13 +30,16 @@ class Pay extends ApiV3Base implements PayFace
     {
         $time = time();
         $data = [];
-        $data['sp_appid'] = $this->entity->appID;
-        $data['sp_mchid'] = $this->entity->mchID;
-        $data['sub_mchid'] = $params['mchID'];
-        $data['description'] = $params['subject'] ?? $params['description'];
+        $data['sp_appid'] = $this->entity->appID;//若是服务商+子商户模式，此值后面会更改
+        $data['sp_mchid'] = $this->entity->mchID;//服务商商户号
+
+        $data['sub_appid'] = $this->entity->appID;
+        $data['sub_mchid'] = $params['mchID'];//子商户号
+
+        $data['description'] = $params['subject'] ?? ($params['description'] ?? '');
         $data['out_trade_no'] = strval($params['number']);
         $data['time_expire'] = date(DATE_RFC3339, $time);
-        $data['attach'] = $params['attach'];
+        $data['attach'] = $params['attach'] ?? '';
         $data['notify_url'] = $params['notify'];
 
         $data['settle_info'] = [];//是否分账
@@ -48,6 +51,18 @@ class Pay extends ApiV3Base implements PayFace
 
         $data['payer'] = [];
         $data['payer']['sp_openid'] = $params['openid'];
+
+        /**
+         * 非服务商直接商户模式，需要单独传入sp_sub信息：
+         * ['sp_sub']['appid']      服务商应用APPID
+         * ['sp_sub']['openid']     用户在此APPID下的OPENID
+         */
+        if (isset($params['sp_sub'])) {
+            $data['sp_appid'] = $params['sp_sub']['appid'];
+
+            $data['payer']['sub_openid'] = $params['openid'];
+            $data['payer']['sp_openid'] = $params['sp_sub']['openid'];
+        }
 
         $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
