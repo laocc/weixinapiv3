@@ -26,7 +26,7 @@ class Pay extends ApiV3Base implements PayFace
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter4_5_1.shtml
      */
-    public function jsapi(array $params)
+    public function jsapi(array $params): array|string
     {
         $time = time();
         $data = [];
@@ -67,10 +67,22 @@ class Pay extends ApiV3Base implements PayFace
         $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
 
+        return $this->paySign($unified['prepay_id'], $time);
+    }
+
+    /**
+     * @param string $payPreID
+     * @param int|null $time
+     * @return array
+     */
+    public function paySign(string $payPreID, int $time = null): array
+    {
+        if (is_null($time)) $time = time();
+
         $values = array();
         $values['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
         $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
-        $values['package'] = "prepay_id={$unified['prepay_id']}";
+        $values['package'] = "prepay_id={$payPreID}";
         $values['signType'] = 'RSA';
 
         $message = "{$this->entity->appID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
@@ -80,14 +92,13 @@ class Pay extends ApiV3Base implements PayFace
         return $values;
     }
 
-
     /**
      * @param array $params
      * @return array|string
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter4_5_2.shtml
      */
-    public function query(array $params)
+    public function query(array $params): array|string
     {
         $param = [];
         $param['sp_mchid'] = $this->entity->mchID;
