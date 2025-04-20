@@ -16,10 +16,12 @@ class Refund extends ApiV3Base implements RefundFace
         $params = [];
         $params['success'] = ($post['refund_status'] ?? $post['status']) === 'SUCCESS';
         $params['waybill'] = $post['refund_id'];
+        $params['pay_waybill'] = $post['transaction_id'];
         $params['number'] = $post['out_refund_no'];
         $params['time'] = strtotime($post['success_time']);
         $params['state'] = strtolower(substr($post['refund_status'], -20));
         $params['amount'] = intval($post['amount']['refund']);
+        $params['total'] = intval($post['amount']['total']);
         return $params;
     }
 
