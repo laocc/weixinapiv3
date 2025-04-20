@@ -1,6 +1,6 @@
 <?php
 
-namespace laocc\weiPay\service;
+namespace laocc\weiPay\merchant;
 
 use laocc\weiPay\ApiV3Base;
 
@@ -13,11 +13,12 @@ class Complaint extends ApiV3Base
      *
      * https://pay.weixin.qq.com/doc/v3/merchant/4012459282
      */
-    public function notifyUrl(string $method, string $url = null)
+
+    public function notifyUrl(string $action, string $url = null)
     {
         $comApi = '/v3/merchant-service/complaint-notifications';
 
-        switch ($method) {
+        switch ($action) {
             case 'get':
                 $data = $this->get($comApi);
                 break;
@@ -43,6 +44,7 @@ class Complaint extends ApiV3Base
     }
 
 
+
     public function reply(array $params)
     {
         $param = [];
@@ -53,6 +55,5 @@ class Complaint extends ApiV3Base
         if (is_string($data)) return $data;
         return $data === 204;
     }
-
 
 }

@@ -1,12 +1,18 @@
 <?php
 
-namespace laocc\weiPay\base;
+namespace laocc\weiPay\auto;
 
-use laocc\weiPay\ApiV3Base;
+use laocc\weiPay\library\Entity;
 use laocc\weiPay\library\RefundFace;
 
-class Refund extends ApiV3Base implements RefundFace
+class Refund implements RefundFace
 {
+    protected Entity $entity;
+
+    public function __construct(Entity $entity)
+    {
+        $this->entity = $entity;
+    }
 
     public function notify(array $post): array|string
     {

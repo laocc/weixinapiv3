@@ -1,6 +1,6 @@
 <?php
 
-namespace laocc\weiPay;
+namespace laocc\weiPay\auto;
 
 use laocc\weiPay\library\Entity;
 use laocc\weiPay\library\PayFace;

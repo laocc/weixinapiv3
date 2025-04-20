@@ -10,7 +10,6 @@
   ],
   "require": {
     "php": ">7.4.0",
-    "laocc/esp": "*",
     "laocc/http": "*",
     "ext-openssl": "*",
     "ext-curl": "*",
