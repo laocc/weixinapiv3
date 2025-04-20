@@ -10,9 +10,22 @@ use function esp\helper\str_rand;
 class Pay extends ApiV3Base implements PayFace
 {
 
+    public function notify(array &$data): array|string
+    {
+        $value = $this->notifyDecrypt($data);
+        if (is_string($value)) return $value;
+
+        $params = [];
+        $params['success'] = $value['trade_state'] === 'SUCCESS';
+        $params['waybill'] = $value['transaction_id'];
+        $params['time'] = strtotime($value['success_time']);
+        $params['state'] = strtolower(substr($value['trade_state'], -20));
+        $params['amount'] = intval($value['amount']['total']);
+        return $params;
+    }
+
     /**
      * 发起公众号、小程序支付
-     * 服务商和直连都可用，取决于 $this->entity->service
      *
      * @param array $params
      * @return array|string
@@ -63,6 +76,31 @@ class Pay extends ApiV3Base implements PayFace
 
         return $values;
     }
+
+
+    /**
+     * native，也就是二维码支付
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function native(array $params): array|string
+    {
+        return [];
+    }
+
+
+    /**
+     * 关闭订单
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function close(array $params): array|string
+    {
+        return [];
+    }
+
 
     /**
      * app支付

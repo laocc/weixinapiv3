@@ -13,26 +13,25 @@ class Complaint
         $this->entity = $entity;
     }
 
+    private function createComplaint()
+    {
+        if ($this->entity->service) {
+            return new \laocc\weiPay\service\Complaint($this->entity);
+        } else {
+            return new \laocc\weiPay\merchant\Complaint($this->entity);
+        }
+    }
+
 
     public function notifyUrl(string $method, string $url = null)
     {
-        if ($this->entity->service) {
-            $pay = new \laocc\weiPay\service\Complaint($this->entity);
-        } else {
-            $pay = new \laocc\weiPay\merchant\Complaint($this->entity);
-        }
-        return $pay->notifyUrl($method, $url);
+        return $this->createComplaint()->notifyUrl($method, $url);
     }
 
 
     public function reply(array $params): bool|string
     {
-        if ($this->entity->service) {
-            $pay = new \laocc\weiPay\service\Complaint($this->entity);
-        } else {
-            $pay = new \laocc\weiPay\merchant\Complaint($this->entity);
-        }
-        return $pay->reply($params);
+        return $this->createComplaint()->reply($params);
     }
 
 

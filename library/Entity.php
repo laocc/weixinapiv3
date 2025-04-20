@@ -12,7 +12,7 @@ class Entity
 {
     public string $mchID;
     public string $appID;
-    public string $apiV3Key;
+    public string $certKey;
     public string $certSerial;
     public string $certFile;
     public string $privatePath = '';
@@ -53,7 +53,7 @@ class Entity
             $this->service = 0;
         }
 
-        $this->apiV3Key = $conf['v3Key'] ?? ($conf['key'] ?? '');
+        $this->certKey = $conf['v3Key'] ?? ($conf['key'] ?? '');
         $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
 
         if (isset($conf['cert'])) {

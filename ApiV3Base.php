@@ -11,6 +11,8 @@ use laocc\weiPay\library\Entity;
 abstract class ApiV3Base extends Library
 {
     protected string $api = 'https://api.mch.weixin.qq.com';
+    protected string $api2 = 'https://api2.mch.weixin.qq.com';
+
     protected Entity $entity;
     protected Crypt $crypt;
     private bool $signCheck = true;
@@ -202,7 +204,7 @@ abstract class ApiV3Base extends Library
      * @param array &$data
      * @return mixed|string
      */
-    public function notifyDecrypt(array &$data)
+    protected function notifyDecrypt(array &$data)
     {
         $serial = getenv('HTTP_WECHATPAY_SERIAL');
         $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
@@ -222,7 +224,7 @@ abstract class ApiV3Base extends Library
         $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
         if ($chk !== 1) return "wxAPIv3 Sign Error";
 
-        $value = $this->decryptToString($this->entity->apiV3Key,
+        $value = $this->decryptToString($this->entity->certKey,
             $data['resource']['associated_data'],
             $data['resource']['nonce'],
             $data['resource']['ciphertext']);

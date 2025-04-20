@@ -14,28 +14,23 @@ class Pay implements PayFace
         $this->entity = $entity;
     }
 
+    private function createPay()
+    {
+        if ($this->entity->service) {
+            return new \laocc\weiPay\service\Pay($this->entity);
+        } else {
+            return new \laocc\weiPay\merchant\Pay($this->entity);
+        }
+    }
+
     /**
      * 受理通知数据，验签，并解密
      * @param array &$data
-     * @return array
+     * @return array|string
      */
-    public function notify(array &$data): array
+    public function notify(array &$data): array|string
     {
-        if ($this->entity->service) {
-            $pay = new \laocc\weiPay\service\Pay($this->entity);
-        } else {
-            $pay = new \laocc\weiPay\merchant\Pay($this->entity);
-        }
-
-        $value = $pay->notifyDecrypt($data);
-
-        $params = [];
-        $params['success'] = $value['trade_state'] === 'SUCCESS';
-        $params['waybill'] = $value['transaction_id'];
-        $params['time'] = strtotime($value['success_time']);
-        $params['state'] = strtolower(substr($value['trade_state'], -20));
-        $params['amount'] = intval($value['amount']['total']);
-        return $params;
+        return $this->createPay()->notify($data);
     }
 
 
@@ -47,12 +42,7 @@ class Pay implements PayFace
      */
     public function app(array $params): array|string
     {
-        if ($this->entity->service) {
-            $pay = new \laocc\weiPay\service\Pay($this->entity);
-        } else {
-            $pay = new \laocc\weiPay\merchant\Pay($this->entity);
-        }
-        return $pay->app($params);
+        return $this->createPay()->app($params);
     }
 
     /**
@@ -64,22 +54,12 @@ class Pay implements PayFace
      */
     public function jsapi(array $params): array|string
     {
-        if ($this->entity->service) {
-            $pay = new \laocc\weiPay\service\Pay($this->entity);
-        } else {
-            $pay = new \laocc\weiPay\merchant\Pay($this->entity);
-        }
-        return $pay->jsapi($params);
+        return $this->createPay()->jsapi($params);
     }
 
     public function h5(array $params): array|string
     {
-        if ($this->entity->service) {
-            $pay = new \laocc\weiPay\service\Pay($this->entity);
-        } else {
-            $pay = new \laocc\weiPay\merchant\Pay($this->entity);
-        }
-        return $pay->h5($params);
+        return $this->createPay()->h5($params);
     }
 
 
@@ -89,12 +69,31 @@ class Pay implements PayFace
      */
     public function query(array $params): array|string
     {
-        if ($this->entity->service) {
-            $pay = new \laocc\weiPay\service\Pay($this->entity);
-        } else {
-            $pay = new \laocc\weiPay\merchant\Pay($this->entity);
-        }
-        return $pay->query($params);
+        return $this->createPay()->query($params);
     }
+
+    /**
+     * native，也就是二维码支付
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function native(array $params): array|string
+    {
+        return $this->createPay()->native($params);
+    }
+
+
+    /**
+     * 关闭订单
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function close(array $params): array|string
+    {
+        return $this->createPay()->close($params);
+    }
+
 
 }

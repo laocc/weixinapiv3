@@ -4,6 +4,8 @@ namespace laocc\weiPay\library;
 
 interface PayFace
 {
+    public function notify(array &$data): array|string;
+
     public function app(array $params): array|string;
 
     public function jsapi(array $params): array|string;
@@ -12,5 +14,22 @@ interface PayFace
 
     public function query(array $params): array|string;
 
-//    public function refund(array $params);
+
+    /**
+     * native，也就是二维码支付
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function native(array $params): array|string;
+
+
+    /**
+     * 关闭订单
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function close(array $params): array|string;
+
 }

@@ -10,50 +10,20 @@ use function esp\helper\str_rand;
 class Pay extends ApiV3Base implements PayFace
 {
 
-    public function app(array $params): array|string
+    public function notify(array &$data): array|string
     {
-        $time = time();
-        $data = [];
+        $value = $this->notifyDecrypt($data);
+        if (is_string($value)) return $value;
 
-        $data['sp_appid'] = $this->entity->appID;
-        $data['sp_mchid'] = $this->entity->mchID;
-        $data['sub_appid'] = $this->entity->merchant['appid'];//子商户的 appid
-        $data['sub_mchid'] = $this->entity->merchant['mchid'];
-
-        $data['description'] = $params['description'];
-        $data['out_trade_no'] = strval($params['number']);
-        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
-        $data['attach'] = $params['attach'];
-        $data['notify_url'] = $params['notify'];
-
-        $data['settle_info'] = [];
-        $data['settle_info']['profit_sharing'] = boolval($params['sharing'] ?? 0);//分账
-
-        $data['amount'] = [];
-        $data['amount']['total'] = $params['fee'];
-        $data['amount']['currency'] = 'CNY';
-
-        $unified = $this->post("/v3/pay/partner/transactions/app", $data);
-
-        if (is_string($unified)) return $unified;
-
-        /**
-         * 这里组合的是送给前端用的 orderInfo部分内容
-         */
-        $value = array();
-        $value['appid'] = $this->entity->appID;
-        $value['partnerid'] = $this->entity->mchID;
-        $value['prepayid'] = $unified['prepay_id'];
-        $value['package'] = "Sign=WXPay";
-        $value['noncestr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
-        $value['timestamp'] = strval($time);//这timeStamp中间的S必须是大写
-
-        $message = "{$this->entity->appID}\n{$value['timestamp']}\n{$value['noncestr']}\n{$value['prepayid']}\n";
-        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
-        $value['sign'] = base64_encode($sign);//生成签名
-
-        return $value;
+        $params = [];
+        $params['success'] = $value['trade_state'] === 'SUCCESS';
+        $params['waybill'] = $value['transaction_id'];
+        $params['time'] = strtotime($value['success_time']);
+        $params['state'] = strtolower(substr($value['trade_state'], -20));
+        $params['amount'] = intval($value['amount']['total']);
+        return $params;
     }
+
 
     /**
      * 发起公众号、小程序支付
@@ -99,6 +69,75 @@ class Pay extends ApiV3Base implements PayFace
         if (is_string($unified)) return $unified;
 
         return $this->paySign($unified['prepay_id'], $signAppID, $time);
+    }
+
+
+    /**
+     * native，也就是二维码支付
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function native(array $params): array|string
+    {
+        return [];
+    }
+
+
+    /**
+     * 关闭订单
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function close(array $params): array|string
+    {
+        return [];
+    }
+
+    public function app(array $params): array|string
+    {
+        $time = time();
+        $data = [];
+
+        $data['sp_appid'] = $this->entity->appID;
+        $data['sp_mchid'] = $this->entity->mchID;
+        $data['sub_appid'] = $this->entity->merchant['appid'];//子商户的 appid
+        $data['sub_mchid'] = $this->entity->merchant['mchid'];
+
+        $data['description'] = $params['description'];
+        $data['out_trade_no'] = strval($params['number']);
+        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
+        $data['attach'] = $params['attach'];
+        $data['notify_url'] = $params['notify'];
+
+        $data['settle_info'] = [];
+        $data['settle_info']['profit_sharing'] = boolval($params['sharing'] ?? 0);//分账
+
+        $data['amount'] = [];
+        $data['amount']['total'] = $params['fee'];
+        $data['amount']['currency'] = 'CNY';
+
+        $unified = $this->post("/v3/pay/partner/transactions/app", $data);
+
+        if (is_string($unified)) return $unified;
+
+        /**
+         * 这里组合的是送给前端用的 orderInfo部分内容
+         */
+        $value = array();
+        $value['appid'] = $this->entity->appID;
+        $value['partnerid'] = $this->entity->mchID;
+        $value['prepayid'] = $unified['prepay_id'];
+        $value['package'] = "Sign=WXPay";
+        $value['noncestr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
+        $value['timestamp'] = strval($time);//这timeStamp中间的S必须是大写
+
+        $message = "{$this->entity->appID}\n{$value['timestamp']}\n{$value['noncestr']}\n{$value['prepayid']}\n";
+        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
+        $value['sign'] = base64_encode($sign);//生成签名
+
+        return $value;
     }
 
     /**

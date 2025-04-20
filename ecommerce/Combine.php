@@ -2,7 +2,6 @@
 
 namespace laocc\weiPay\ecommerce;
 
-
 use function esp\helper\str_rand;
 use laocc\weiPay\ApiV3Base;
 

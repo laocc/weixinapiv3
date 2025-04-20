@@ -7,6 +7,8 @@ use laocc\weiPay\ApiV3Base;
 class Complaint extends ApiV3Base
 {
     /**
+     * 投诉回调
+     *
      * 文档：
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter10_2_11.shtml
@@ -42,7 +44,6 @@ class Complaint extends ApiV3Base
 
         return $data;
     }
-
 
 
     public function reply(array $params)
