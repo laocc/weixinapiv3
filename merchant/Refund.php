@@ -29,13 +29,10 @@ class Refund extends ApiV3Base implements RefundFace
 
     public function query(array $params): array|string
     {
-        $data = [];
-        $data['sub_mchid'] = $this->entity->mchID;
-
         if (isset($params['waybill']) and !empty($params['waybill'])) {
-            $rest = $this->get("/v3/ecommerce/refunds/id/{$params['transaction']}", $data);
+            $rest = $this->get("/v3/ecommerce/refunds/id/{$params['waybill']}");
         } else {
-            $rest = $this->get("/v3/ecommerce/refunds/out-refund-no/{$params['number']}", $data);
+            $rest = $this->get("/v3/refund/domestic/refunds/{$params['number']}");
         }
         if (is_string($rest)) return $rest;
         return $rest;
@@ -66,7 +63,12 @@ class Refund extends ApiV3Base implements RefundFace
         $data = $this->post("/v3/refund/domestic/refunds", $param);
         if (is_string($data)) return $data;
 
-        return $data;
+        return [
+            'waybill' => $data['refund_id'],
+            'number' => $data['out_refund_no'],
+            'time' => strtotime($data['create_time']),
+            'amount' => intval($data['amount']['payer_refund']),
+        ];
     }
 
     /**
