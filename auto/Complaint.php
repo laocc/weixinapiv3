@@ -23,16 +23,16 @@ class Complaint
     }
 
 
+    public function notify(string $json): array|string
+    {
+        return $this->createComplaint()->notify($json);
+    }
+
     public function notifyUrl(string $method, string $url = null)
     {
         return $this->createComplaint()->notifyUrl($method, $url);
     }
 
-
-    public function notify(string $json): bool|string
-    {
-        return $this->createComplaint()->notify($json);
-    }
 
 
 }
