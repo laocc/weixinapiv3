@@ -14,19 +14,24 @@ final class Certificates extends ApiV3Base
      *
      * 服务商
      * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/wechatpay5_1.shtml
+     * https://pay.weixin.qq.com/doc/v3/partner/4012715700
+     *
      * 直连商户：
      * https://pay.weixin.qq.com/wiki/doc/apiv3/apis/wechatpay5_1.shtml
+     * https://pay.weixin.qq.com/doc/v3/merchant/4012551764
      */
     public function downloadPlatCert(string $apiV3Key)
     {
         $Certificates = $this->signCheck(false)->get("/v3/certificates");
         if (is_string($Certificates)) return $Certificates;
+
         foreach ($Certificates['data'] as &$cert) {
             $cert['cert'] = $this->decryptToString($apiV3Key,
                 $cert['encrypt_certificate']['associated_data'],
                 $cert['encrypt_certificate']['nonce'],
                 $cert['encrypt_certificate']['ciphertext']);
         }
+
         return $Certificates;
     }
 

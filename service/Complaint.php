@@ -11,6 +11,8 @@ class Complaint extends ApiV3Base
      * 文档：
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter10_2_11.shtml
+     *
+     * https://pay.weixin.qq.com/doc/v3/merchant/4012459282
      */
     private string $comApi = '/v3/merchant-service/complaint-notifications';
 

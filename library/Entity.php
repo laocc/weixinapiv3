@@ -14,15 +14,15 @@ class Entity
     public string $appID;
     public string $apiV3Key;
     public string $certSerial;
+    public string $certFile;
     public string $privatePath = '';
     public string $publicPath = '';
 
-    public string $shopMchID = '';//子商户
-    public string $shopAppID = '';
+    public array $merchant;//子商户
 
-    public int $service;//服务商类型，1直连商户，2普通服务商，4电商服务商
+    public int $service = 1;//服务商类型，1直连商户，2普通服务商，4电商服务商
 
-    public $certEncrypt;
+    public mixed $certEncrypt;
 
     /**
      * 可以自行引用此类并实现此类的相关方法
@@ -32,23 +32,26 @@ class Entity
      */
     public function __construct(array $conf)
     {
-        $this->service = intval($conf['service'] ?? 0);
+        $this->mchID = $conf['mchid'] ?? ($conf['mchID'] ?? ($conf['mchId'] ?? ''));
+        if (!$this->mchID) throw new Error("传入数据需要含有微信支付商户mchID");
 
-        if (!isset($conf['mchID'])) throw new Error("传入数据需要含有微信支付商户基本数据结构");
+        $this->appID = $conf['appid'] ?? ($conf['appID'] ?? ($conf['appId'] ?? ''));
+        if (!$this->appID) throw new Error("传入数据需要含有微信支付商户appID");
 
-        $this->mchID = $conf['mchID'] ?? ($conf['mchid'] ?? '');
-        foreach (['appID', 'appid', 'miniAppID', 'mppAppID', 'appId'] as $ak) {
-            if (isset($conf[$ak])) {
-                $this->appID = $conf[$ak];
-                break;
-            }
+//        if (!isset($conf['merchant'])) throw new Error("请指定merchant=false或=['mchid','appid']");
+
+        if (is_array($conf['merchant'] ?? '')) {
+            $this->service = 1;
+            $this->merchant = [
+                'mchid' => $conf['merchant']['mchid'] ?? '',
+                'appid' => $conf['merchant']['appid'] ?? '',
+            ];
+        } else {
+            $this->service = 0;
         }
 
-        if (isset($conf['shopMchID'])) $this->shopMchID = $conf['shopMchID'];
-        if (isset($conf['shopAppID'])) $this->shopAppID = $conf['shopAppID'];
-
-        $this->apiV3Key = $conf['v3Key'] ?? '';
-        $this->certSerial = $conf['certSerial'] ?? '';
+        $this->apiV3Key = $conf['v3Key'] ?? ($conf['key'] ?? '');
+        $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
 
         if (isset($conf['cert'])) {
             $this->privatePath = $conf['cert']['private'] ?? '';
@@ -73,12 +76,13 @@ class Entity
         /**
          * 这里用到的密钥是在微信支付后台申请的商户私钥，或服务商私钥
          */
-        $cert = "{$this->privatePath}/{$this->certSerial}/apiclient_key.pem";
-        if (!is_readable($cert)) {
-            $cert = "{$this->privatePath}/{$this->mchID}/apiclient_key.pem";
-            if (!is_readable($cert)) throw new Error("商户证书文件不存在，请检查");
+        $this->certFile = "{$this->privatePath}/{$this->certSerial}/apiclient_key.pem";
+        if (!is_readable($this->certFile)) {
+            $this->certFile = "{$this->privatePath}/{$this->mchID}/apiclient_key.pem";
+            if (!is_readable($this->certFile)) throw new Error("商户证书文件不存在，请检查");
         }
-        $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($cert));
+
+        $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($this->certFile));
     }
 
     public function __toString()
@@ -87,6 +91,9 @@ class Entity
             'mchID' => $this->mchID,
             'appID' => $this->appID,
             'certSerial' => $this->certSerial,
+            'privatePath' => $this->privatePath,
+            'certFile' => $this->certFile,
+            'merchant' => $this->merchant,
         ], 256 | 64 | 128);
     }
 

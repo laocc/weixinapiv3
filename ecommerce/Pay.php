@@ -36,7 +36,7 @@ class Pay extends ApiV3Base implements PayFace
 
         $data['description'] = $params['description'];
         $data['out_trade_no'] = strval($params['number']);
-        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 60));
+        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
         $data['attach'] = $params['attach'];
         $data['notify_url'] = $params['notify'];
 

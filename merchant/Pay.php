@@ -16,28 +16,17 @@ class Pay extends ApiV3Base implements PayFace
      * @param array $params
      * @return array|string
      */
-    public function app(array $params)
+    public function app(array $params):array|string
     {
         $time = time();
         $data = [];
 
-        if ($this->entity->service > 1) {
-            $data['sp_appid'] = $this->entity->appID;
-            $data['sp_mchid'] = $this->entity->mchID;
-
-            if (isset($params['appID'])) {
-                //用子商户的appid
-                $data['sub_appid'] = $params['appID'];
-            }
-            $data['sub_mchid'] = $params['mchID'];
-        } else {
-            $data['appid'] = $this->entity->appID;
-            $data['mchid'] = $this->entity->mchID;
-        }
+        $data['appid'] = $this->entity->appID;
+        $data['mchid'] = $this->entity->mchID;
 
         $data['description'] = $params['description'];
         $data['out_trade_no'] = strval($params['number']);
-        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 60));
+        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
         $data['attach'] = $params['attach'];
         $data['notify_url'] = $params['notify'];
 
@@ -48,12 +37,7 @@ class Pay extends ApiV3Base implements PayFace
         $data['amount']['total'] = $params['fee'];
         $data['amount']['currency'] = 'CNY';
 
-        if ($this->entity->service > 1) {
-            $unified = $this->post("/v3/pay/partner/transactions/app", $data);
-        } else {
-            $unified = $this->post("/v3/pay/transactions/app", $data);
-        }
-
+        $unified = $this->post("/v3/pay/transactions/app", $data);
         if (is_string($unified)) return $unified;
 
         /**
@@ -74,11 +58,6 @@ class Pay extends ApiV3Base implements PayFace
         return $value;
     }
 
-    public function h5(array $params)
-    {
-        // TODO: Implement h5() method.
-    }
-
     /**
      * 发起公众号、小程序支付
      * 服务商和直连都可用，取决于 $this->entity->service
@@ -86,28 +65,17 @@ class Pay extends ApiV3Base implements PayFace
      * @param array $params
      * @return array|string
      */
-    public function jsapi(array $params)
+    public function jsapi(array $params):array|string
     {
         $time = time();
         $data = [];
 
-        if ($this->entity->service > 1) {
-            $data['sp_appid'] = $this->entity->appID;
-            $data['sp_mchid'] = $this->entity->mchID;
-
-            if (isset($params['appID'])) {
-                //用子商户的appid
-                $data['sub_appid'] = $params['appID'];
-            }
-            $data['sub_mchid'] = $params['mchID'];
-        } else {
-            $data['appid'] = $this->entity->appID;
-            $data['mchid'] = $this->entity->mchID;
-        }
+        $data['appid'] = $this->entity->appID;
+        $data['mchid'] = $this->entity->mchID;
 
         $data['description'] = $params['subject'] ?? $params['description'];
         $data['out_trade_no'] = strval($params['number']);
-        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 60));
+        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
         $data['attach'] = $params['attach'];
         $data['notify_url'] = $params['notify'];
 
@@ -119,17 +87,8 @@ class Pay extends ApiV3Base implements PayFace
         $data['amount']['currency'] = 'CNY';
 
         $data['payer'] = [];
-        if ($this->entity->service > 1) {
-            if (isset($params['appID'])) {
-                $data['payer']['sub_openid'] = $params['openid'];
-            } else {
-                $data['payer']['sp_openid'] = $params['openid'];
-            }
-            $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
-        } else {
-            $data['payer']['openid'] = $params['openid'];
-            $unified = $this->post("/v3/pay/transactions/jsapi", $data);
-        }
+        $data['payer']['openid'] = $params['openid'];
+        $unified = $this->post("/v3/pay/transactions/jsapi", $data);
 
         if (is_string($unified)) return $unified;
 
@@ -148,22 +107,27 @@ class Pay extends ApiV3Base implements PayFace
     }
 
 
+    public function h5(array $params):array|string
+    {
+        return [];
+    }
+
     /**
      * @param array $params
      * @return array|string
      */
-    public function query(array $params)
+    public function query(array $params):array|string
     {
         $param = [];
         $param['mchid'] = $this->entity->mchID;
 
-        if ($params['waybill'] ?? '') {
+        if (isset($params['waybill'])) {
             $data = $this->get("/v3/pay/transactions/id/{$params['waybill']}", $param);
-        } else if ($params['number'] ?? '') {
-            $data = $this->get("/v3/pay/transactions/out-trade-no/{$params['number']}", $param);
+
         } else {
-            return "商户订单号或通道订单号至少要填1项";
+            $data = $this->get("/v3/pay/transactions/out-trade-no/{$params['number']}", $param);
         }
+
         if (is_string($data)) return $data;
 
         return [

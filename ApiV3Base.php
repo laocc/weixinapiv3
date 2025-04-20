@@ -16,6 +16,10 @@ abstract class ApiV3Base extends Library
     private bool $signCheck = true;
     private bool $returnHttp = false;
 
+    /**
+     * @param Entity $entity
+     * @return void
+     */
     public function _init(Entity $entity)
     {
         $this->entity = $entity;
@@ -158,14 +162,13 @@ abstract class ApiV3Base extends Library
      * 如果是获取证书，解密后，要再次导出公钥：
      * openssl x509 -in cert.pem -pubkey -noout > public.pem
      *
-     * @param $aesKey
-     * @param $associatedData
-     * @param $nonceStr
-     * @param $ciphertext
+     * @param string $aesKey
+     * @param string $associatedData
+     * @param string $nonceStr
+     * @param string $ciphertext
      * @return false|string
-     *
      */
-    protected function decryptToString($aesKey, $associatedData, $nonceStr, $ciphertext)
+    protected function decryptToString(string $aesKey, string $associatedData, string $nonceStr, string $ciphertext)
     {
         $ciphertext = \base64_decode($ciphertext);
 

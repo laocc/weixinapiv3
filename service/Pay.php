@@ -9,14 +9,50 @@ use function esp\helper\str_rand;
 
 class Pay extends ApiV3Base implements PayFace
 {
-    public function app(array $params)
-    {
-        // TODO: Implement app() method.
-    }
 
-    public function h5(array $params)
+    public function app(array $params): array|string
     {
-        // TODO: Implement h5() method.
+        $time = time();
+        $data = [];
+
+        $data['sp_appid'] = $this->entity->appID;
+        $data['sp_mchid'] = $this->entity->mchID;
+        $data['sub_appid'] = $this->entity->merchant['appid'];//子商户的 appid
+        $data['sub_mchid'] = $this->entity->merchant['mchid'];
+
+        $data['description'] = $params['description'];
+        $data['out_trade_no'] = strval($params['number']);
+        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
+        $data['attach'] = $params['attach'];
+        $data['notify_url'] = $params['notify'];
+
+        $data['settle_info'] = [];
+        $data['settle_info']['profit_sharing'] = boolval($params['sharing'] ?? 0);//分账
+
+        $data['amount'] = [];
+        $data['amount']['total'] = $params['fee'];
+        $data['amount']['currency'] = 'CNY';
+
+        $unified = $this->post("/v3/pay/partner/transactions/app", $data);
+
+        if (is_string($unified)) return $unified;
+
+        /**
+         * 这里组合的是送给前端用的 orderInfo部分内容
+         */
+        $value = array();
+        $value['appid'] = $this->entity->appID;
+        $value['partnerid'] = $this->entity->mchID;
+        $value['prepayid'] = $unified['prepay_id'];
+        $value['package'] = "Sign=WXPay";
+        $value['noncestr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
+        $value['timestamp'] = strval($time);//这timeStamp中间的S必须是大写
+
+        $message = "{$this->entity->appID}\n{$value['timestamp']}\n{$value['noncestr']}\n{$value['prepayid']}\n";
+        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
+        $value['sign'] = base64_encode($sign);//生成签名
+
+        return $value;
     }
 
     /**
@@ -33,8 +69,8 @@ class Pay extends ApiV3Base implements PayFace
         $data['sp_appid'] = $this->entity->appID;//若是服务商+子商户模式，此值后面会更改
         $data['sp_mchid'] = $this->entity->mchID;//服务商商户号
 
-        $data['sub_appid'] = $this->entity->appID;
-        $data['sub_mchid'] = $params['mchID'];//子商户号
+        $data['sub_appid'] = $this->entity->merchant['appid'];
+        $data['sub_mchid'] = $this->entity->merchant['mchid'];//子商户号
 
         $data['description'] = $params['subject'] ?? ($params['description'] ?? '');
         $data['out_trade_no'] = strval($params['number']);
@@ -54,14 +90,14 @@ class Pay extends ApiV3Base implements PayFace
 
         /**
          * 非服务商直接商户模式，需要单独传入sp_sub信息：
+         * 也就是这个appid是服务商的，不是商户的
          * ['sp_sub']['appid']      服务商应用APPID
          * ['sp_sub']['openid']     用户在此APPID下的OPENID
          */
         if (isset($params['sp_sub'])) {
             $data['sp_appid'] = $params['sp_sub']['appid'];
-
-            $data['payer']['sub_openid'] = $params['openid'];
             $data['payer']['sp_openid'] = $params['sp_sub']['openid'];
+//            $data['payer']['sub_openid'] = $params['openid'];
         }
 
         $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
@@ -92,6 +128,12 @@ class Pay extends ApiV3Base implements PayFace
         return $values;
     }
 
+    public function h5(array $params): array|string
+    {
+        // TODO: Implement h5() method.
+        return [];
+    }
+
     /**
      * @param array $params
      * @return array|string
@@ -102,7 +144,7 @@ class Pay extends ApiV3Base implements PayFace
     {
         $param = [];
         $param['sp_mchid'] = $this->entity->mchID;
-        $param['sub_mchid'] = $params['mchID'];
+        $param['sub_mchid'] = $this->entity->merchant['mchid'];
         if (empty($params['number'] ?? '') and empty($params['waybill'] ?? '')) {
             return '商户订单号或微信订单号至少要提供一个';
         }

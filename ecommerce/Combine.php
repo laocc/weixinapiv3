@@ -23,7 +23,7 @@ class Combine extends ApiV3Base
         $data['combine_out_trade_no'] = $order['number'];
         $data['combine_payer_info'] = ['openid' => $order['openid']];
         $data['time_start'] = date(DATE_RFC3339, $time);
-        $data['time_expire'] = date(DATE_RFC3339, $time + 86400);
+        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
         $data['notify_url'] = $order['notify'];
 
         $data['sub_orders'] = [];

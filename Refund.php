@@ -25,8 +25,8 @@ class Refund extends ApiV3Base
     {
         $data = [];
 
-        if ($this->entity->service > 1) {
-            $data['sub_mchid'] = $this->entity->shopMchID;
+        if ($this->entity->service) {
+            $data['sub_mchid'] = $this->entity->merchant['mchid'];
         }
 
         $rest = $this->get("/v3/refund/domestic/refunds/{$param['number']}", $data);
@@ -54,8 +54,8 @@ class Refund extends ApiV3Base
     public function send(array $refund)
     {
         $param = [];
-        if ($this->entity->service > 1) {
-            $data['sub_mchid'] = $this->entity->shopMchID;
+        if ($this->entity->service) {
+            $data['sub_mchid'] = $this->entity->merchant['mchid'];
         }
 
         $param['transaction_id'] = $refund['waybill'];//微信订单号
