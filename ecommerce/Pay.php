@@ -16,8 +16,10 @@ class Pay extends ApiV3Base implements PayFace
         if (is_string($value)) return $value;
 
         $params = [];
+        $params['mchid'] = $value['sub_mch_id'];//商户号
         $params['success'] = $value['trade_state'] === 'SUCCESS';
         $params['waybill'] = $value['transaction_id'];
+        $params['number'] = $value['out_trade_no'];
         $params['time'] = strtotime($value['success_time']);
         $params['state'] = strtolower(substr($value['trade_state'], -20));
         $params['amount'] = intval($value['amount']['total']);
