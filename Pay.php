@@ -17,9 +17,9 @@ class Pay implements PayFace
     /**
      * 受理通知数据，验签，并解密
      * @param array &$data
-     * @return mixed|string
+     * @return array
      */
-    public function notifyDecrypt(array &$data): mixed
+    public function notify(array &$data): array
     {
         if ($this->entity->service) {
             $pay = new \laocc\weiPay\service\Pay($this->entity);
@@ -27,11 +27,8 @@ class Pay implements PayFace
             $pay = new \laocc\weiPay\merchant\Pay($this->entity);
         }
 
-        return $pay->notifyDecrypt($data);
-    }
+        $value = $pay->notifyDecrypt($data);
 
-    public function notify(array $value): array
-    {
         $params = [];
         $params['success'] = $value['trade_state'] === 'SUCCESS';
         $params['waybill'] = $value['transaction_id'];

@@ -23,7 +23,7 @@ class Register extends ApiV3Base
         $post['bank_address_code'] = $param['area'];//开户银行省市编码
         if ($param['bank'] === '其他银行') {
             $post['bank_name'] = $param['name'];//开户银行全称 （含支行）
-            if (strpos($param['name'], $param['bank']) !== 0) {
+            if (!str_starts_with($param['name'], $param['bank'])) {
                 $post['bank_name'] = $param['bank'] . $param['name'];//开户银行全称 （含支行）
             }
         }

@@ -9,14 +9,14 @@ use function esp\helper\str_rand;
 
 class Pay extends ApiV3Base implements PayFace
 {
-    public function app(array $params)
+    public function app(array $params): array|string
     {
-        // TODO: Implement app() method.
+        return '';
     }
 
-    public function h5(array $params)
+    public function h5(array $params): array|string
     {
-        // TODO: Implement h5() method.
+        return '';
     }
 
     /**
@@ -24,7 +24,7 @@ class Pay extends ApiV3Base implements PayFace
      * @param array $params
      * @return array|string
      */
-    public function jsapi(array $params)
+    public function jsapi(array $params): array|string
     {
         $time = time();
         $data = [];
@@ -74,7 +74,7 @@ class Pay extends ApiV3Base implements PayFace
      *
      * https://pay.weixin.qq.com/wiki/doc/apiv3_partner/apis/chapter7_2_5.shtml
      */
-    public function query(array $params)
+    public function query(array $params): array|string
     {
         $param = [];
         $param['sp_mchid'] = $this->entity->mchID;
@@ -94,9 +94,5 @@ class Pay extends ApiV3Base implements PayFace
         ];
     }
 
-    public function refund(array $params)
-    {
-        // TODO: Implement refund() method.
-    }
 
 }

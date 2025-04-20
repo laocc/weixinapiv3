@@ -41,11 +41,14 @@ class Entity
 //        if (!isset($conf['merchant'])) throw new Error("请指定merchant=false或=['mchid','appid']");
 
         if (is_array($conf['merchant'] ?? '')) {
-            $this->service = 1;
+
+            $this->service = ($conf['ecommerce'] ?? 0) ? 2 : 1;
+
             $this->merchant = [
                 'mchid' => $conf['merchant']['mchid'] ?? '',
                 'appid' => $conf['merchant']['appid'] ?? '',
             ];
+
         } else {
             $this->service = 0;
         }
