@@ -31,10 +31,10 @@ class Refund extends ApiV3Base implements RefundFace
     public function query(array $params): array|string
     {
         $data = [];
-        $data['sub_mchid'] = $params['mchid'];
+        $data['sub_mchid'] = $this->entity->merchant['mchid'];
 
-        if (isset($params['transaction']) and !empty($params['transaction'])) {
-            $rest = $this->get("/v3/ecommerce/refunds/id/{$params['transaction']}", $data);
+        if (isset($params['waybill']) and !empty($params['waybill'])) {
+            $rest = $this->get("/v3/ecommerce/refunds/id/{$params['waybill']}", $data);
         } else {
             $rest = $this->get("/v3/ecommerce/refunds/out-refund-no/{$params['number']}", $data);
         }

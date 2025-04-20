@@ -15,6 +15,10 @@ class Entity
     public string $certKey;
     public string $certSerial;
     public string $certFile;
+
+    public string $publicSerial;
+    public string $publicFile;
+
     public string $privatePath = '';
     public string $publicPath = '';
 
@@ -51,6 +55,7 @@ class Entity
             $this->service = 0;
         }
 
+        $this->publicSerial = $conf['publicSerial'];
         $this->certKey = $conf['certKey'] ?? ($conf['key'] ?? ($conf['v3Key'] ?? ''));
         $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
 
@@ -73,6 +78,7 @@ class Entity
 
         $this->privatePath = rtrim($this->privatePath, '/');
         $this->publicPath = rtrim($this->publicPath, '/');
+        $this->publicFile = "{$this->publicPath}/{$this->publicSerial}/public.pem";
 
         /**
          * 这里用到的密钥是在微信支付后台申请的商户私钥，或服务商私钥

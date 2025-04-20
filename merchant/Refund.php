@@ -2,7 +2,6 @@
 
 namespace laocc\weiPay\merchant;
 
-use esp\http\HttpResult;
 use laocc\weiPay\ApiV3Base;
 use laocc\weiPay\library\RefundFace;
 
@@ -31,9 +30,9 @@ class Refund extends ApiV3Base implements RefundFace
     public function query(array $params): array|string
     {
         $data = [];
-        $data['sub_mchid'] = $params['mchid'];
+        $data['sub_mchid'] = $this->entity->mchID;
 
-        if (isset($params['transaction']) and !empty($params['transaction'])) {
+        if (isset($params['waybill']) and !empty($params['waybill'])) {
             $rest = $this->get("/v3/ecommerce/refunds/id/{$params['transaction']}", $data);
         } else {
             $rest = $this->get("/v3/ecommerce/refunds/out-refund-no/{$params['number']}", $data);
