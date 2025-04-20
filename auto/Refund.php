@@ -23,9 +23,9 @@ class Refund implements RefundFace
         }
     }
 
-    public function notify(array $post): array|string
+    public function notify(string $json): array|string
     {
-        return $this->createRefund()->notify($post);
+        return $this->createRefund()->notify($json);
     }
 
 

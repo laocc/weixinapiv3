@@ -7,6 +7,7 @@ use esp\core\Library;
 use esp\http\Http;
 use laocc\weiPay\library\Crypt;
 use laocc\weiPay\library\Entity;
+use function esp\helper\xml_decode;
 
 abstract class ApiV3Base extends Library
 {
@@ -201,18 +202,16 @@ abstract class ApiV3Base extends Library
 
     /**
      * 受理通知数据，验签，并解密
-     * @param array &$data
+     * @param string|null $json
      * @return mixed|string
      */
-    protected function notifyDecrypt(array &$data)
+    protected function notifyDecrypt(string $json = null)
     {
         $serial = getenv('HTTP_WECHATPAY_SERIAL');
         $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
         $nonce = getenv('HTTP_WECHATPAY_NONCE');
         $sign = getenv('HTTP_WECHATPAY_SIGNATURE');
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
-        if (empty($data)) return '未接收到数据';
+        if (is_null($json)) $json = file_get_contents('php://input');
 
         $message = "{$time}\n{$nonce}\n{$json}\n";
         if (isset($this->crypt)) {
@@ -223,6 +222,13 @@ abstract class ApiV3Base extends Library
         }
         $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
         if ($chk !== 1) return "wxAPIv3 Sign Error";
+
+        if (preg_match('/\{.+\}/', $json)) {
+            $data = json_decode($json, true);
+        } else {
+            $data = xml_decode($json, true);
+        }
+        if (empty($data)) return '未接收到数据';
 
         $value = $this->decryptToString($this->entity->certKey,
             $data['resource']['associated_data'],

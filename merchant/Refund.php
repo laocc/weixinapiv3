@@ -10,9 +10,9 @@ class Refund extends ApiV3Base implements RefundFace
 {
 
 
-    public function notify(array $post): array|string
+    public function notify(string $json): array|string
     {
-        $value = $this->notifyDecrypt($post);
+        $value = $this->notifyDecrypt($json);
         if (is_string($value)) return $value;
 
         if (!isset($value['refund_id'])) return json_encode($value, 320);

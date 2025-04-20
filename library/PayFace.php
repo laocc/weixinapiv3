@@ -4,7 +4,7 @@ namespace laocc\weiPay\library;
 
 interface PayFace
 {
-    public function notify(array &$data): array|string;
+    public function notify(string $json): array|string;
 
     public function app(array $params): array|string;
 

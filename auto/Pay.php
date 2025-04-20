@@ -25,12 +25,12 @@ class Pay implements PayFace
 
     /**
      * 受理通知数据，验签，并解密
-     * @param array &$data
+     * @param string $json
      * @return array|string
      */
-    public function notify(array &$data): array|string
+    public function notify(string $json): array|string
     {
-        return $this->createPay()->notify($data);
+        return $this->createPay()->notify($json);
     }
 
 
