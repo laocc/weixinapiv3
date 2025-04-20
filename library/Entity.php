@@ -38,8 +38,6 @@ class Entity
         $this->appID = $conf['appid'] ?? ($conf['appID'] ?? ($conf['appId'] ?? ''));
         if (!$this->appID) throw new Error("传入数据需要含有微信支付商户appID");
 
-//        if (!isset($conf['merchant'])) throw new Error("请指定merchant=false或=['mchid','appid']");
-
         if (is_array($conf['merchant'] ?? '')) {
 
             $this->service = ($conf['ecommerce'] ?? 0) ? 2 : 1;
@@ -53,7 +51,7 @@ class Entity
             $this->service = 0;
         }
 
-        $this->certKey = $conf['v3Key'] ?? ($conf['key'] ?? '');
+        $this->certKey = $conf['certKey'] ?? ($conf['key'] ?? ($conf['v3Key'] ?? ''));
         $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
 
         if (isset($conf['cert'])) {
