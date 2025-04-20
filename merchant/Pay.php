@@ -11,12 +11,66 @@ class Pay extends ApiV3Base implements PayFace
 {
 
     /**
+     * 发起公众号、小程序支付
+     * 服务商和直连都可用，取决于 $this->entity->service
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function jsapi(array $params): array|string
+    {
+        $time = time();
+        $data = [];
+
+        $data['appid'] = $this->entity->appID;
+        $data['mchid'] = $this->entity->mchID;
+
+        $data['description'] = $params['subject'] ?? $params['description'];
+        $data['out_trade_no'] = strval($params['number']);
+        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
+        $data['attach'] = $params['attach'];
+        $data['notify_url'] = $params['notify'];
+
+        $data['settle_info'] = [];
+        $data['settle_info']['profit_sharing'] = boolval($params['sharing'] ?? 0);//分账
+
+        $data['amount'] = [];
+        $data['amount']['total'] = $params['fee'];
+        $data['amount']['currency'] = 'CNY';
+
+        $data['payer'] = [];
+        $data['payer']['openid'] = $params['openid'];
+        $unified = $this->post("/v3/pay/transactions/jsapi", $data);
+        if (is_string($unified)) return $unified;
+
+        return $this->paySign($unified['prepay_id'], $this->entity->appID, $time);
+    }
+
+    public function paySign(string $payPreID, string $appid, int $time = null): array
+    {
+        if (is_null($time)) $time = time();
+
+        $values = array();
+        $values['appId'] = $appid;
+        $values['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
+        $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
+        $values['package'] = "prepay_id={$payPreID}";
+        $values['signType'] = 'RSA';
+
+        $message = "{$appid}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
+        $values['paySign'] = base64_encode($sign);//生成签名
+
+        return $values;
+    }
+
+    /**
      * app支付
      *
      * @param array $params
      * @return array|string
      */
-    public function app(array $params):array|string
+    public function app(array $params): array|string
     {
         $time = time();
         $data = [];
@@ -58,56 +112,8 @@ class Pay extends ApiV3Base implements PayFace
         return $value;
     }
 
-    /**
-     * 发起公众号、小程序支付
-     * 服务商和直连都可用，取决于 $this->entity->service
-     *
-     * @param array $params
-     * @return array|string
-     */
-    public function jsapi(array $params):array|string
-    {
-        $time = time();
-        $data = [];
 
-        $data['appid'] = $this->entity->appID;
-        $data['mchid'] = $this->entity->mchID;
-
-        $data['description'] = $params['subject'] ?? $params['description'];
-        $data['out_trade_no'] = strval($params['number']);
-        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
-        $data['attach'] = $params['attach'];
-        $data['notify_url'] = $params['notify'];
-
-        $data['settle_info'] = [];
-        $data['settle_info']['profit_sharing'] = boolval($params['sharing'] ?? 0);//分账
-
-        $data['amount'] = [];
-        $data['amount']['total'] = $params['fee'];
-        $data['amount']['currency'] = 'CNY';
-
-        $data['payer'] = [];
-        $data['payer']['openid'] = $params['openid'];
-        $unified = $this->post("/v3/pay/transactions/jsapi", $data);
-
-        if (is_string($unified)) return $unified;
-
-        $values = array();
-        $values['appId'] = $this->entity->appID;
-        $values['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
-        $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
-        $values['package'] = "prepay_id={$unified['prepay_id']}";
-        $values['signType'] = 'RSA';
-
-        $message = "{$this->entity->appID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
-        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
-        $values['paySign'] = base64_encode($sign);//生成签名
-
-        return $values;
-    }
-
-
-    public function h5(array $params):array|string
+    public function h5(array $params): array|string
     {
         return [];
     }
@@ -116,7 +122,7 @@ class Pay extends ApiV3Base implements PayFace
      * @param array $params
      * @return array|string
      */
-    public function query(array $params):array|string
+    public function query(array $params): array|string
     {
         $param = [];
         $param['mchid'] = $this->entity->mchID;

@@ -85,43 +85,40 @@ class Pay extends ApiV3Base implements PayFace
         $data['amount']['total'] = $params['fee'];
         $data['amount']['currency'] = 'CNY';
 
-        $data['payer'] = [];
-        $data['payer']['sp_openid'] = $params['openid'];
+        $signAppID = $this->entity->appID;
 
-        /**
-         * 非服务商直接商户模式，需要单独传入sp_sub信息：
-         * 也就是这个appid是服务商的，不是商户的
-         * ['sp_sub']['appid']      服务商应用APPID
-         * ['sp_sub']['openid']     用户在此APPID下的OPENID
-         */
-        if (isset($params['sp_sub'])) {
-            $data['sp_appid'] = $params['sp_sub']['appid'];
-            $data['payer']['sp_openid'] = $params['sp_sub']['openid'];
-//            $data['payer']['sub_openid'] = $params['openid'];
+        $data['payer'] = [];
+        if (isset($params['sp_openid'])) {
+            $data['payer']['sp_openid'] = $params['sp_openid'];//在服务端应用下的OpenID
+        } else {
+            $data['payer']['sub_openid'] = $params['openid'];//子商户的App中的OpenID
+            $signAppID = $this->entity->merchant['appid'];
         }
 
         $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
 
-        return $this->paySign($unified['prepay_id'], $time);
+        return $this->paySign($unified['prepay_id'], $signAppID, $time);
     }
 
     /**
      * @param string $payPreID
+     * @param string $appid
      * @param int|null $time
      * @return array
      */
-    public function paySign(string $payPreID, int $time = null): array
+    public function paySign(string $payPreID, string $appid, int $time = null): array
     {
         if (is_null($time)) $time = time();
 
         $values = array();
+        $values['appId'] = $appid;
         $values['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
         $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
         $values['package'] = "prepay_id={$payPreID}";
         $values['signType'] = 'RSA';
 
-        $message = "{$this->entity->appID}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        $message = "{$appid}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
         openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
         $values['paySign'] = base64_encode($sign);//生成签名
 
