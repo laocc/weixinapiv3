@@ -12,16 +12,19 @@ class Refund extends ApiV3Base implements RefundFace
 
     public function notify(array $post): array|string
     {
-        if (!isset($post['refund_id'])) return json_encode($post, 320);
+        $value = $this->notifyDecrypt($post);
+        if (is_string($value)) return $value;
+
+        if (!isset($value['refund_id'])) return json_encode($value, 320);
         $params = [];
-        $params['success'] = ($post['refund_status'] ?? $post['status']) === 'SUCCESS';
-        $params['waybill'] = $post['refund_id'];
-        $params['pay_waybill'] = $post['transaction_id'];
-        $params['number'] = $post['out_refund_no'];
-        $params['time'] = strtotime($post['success_time']);
-        $params['state'] = strtolower(substr($post['refund_status'], -20));
-        $params['amount'] = intval($post['amount']['refund']);
-        $params['total'] = intval($post['amount']['total']);
+        $params['success'] = ($value['refund_status'] ?? $value['status']) === 'SUCCESS';
+        $params['waybill'] = $value['refund_id'];
+        $params['pay_waybill'] = $value['transaction_id'];
+        $params['number'] = $value['out_refund_no'];
+        $params['time'] = strtotime($value['success_time']);
+        $params['state'] = strtolower(substr($value['refund_status'], -20));
+        $params['amount'] = intval($value['amount']['refund']);
+        $params['total'] = intval($value['amount']['total']);
         return $params;
     }
 
