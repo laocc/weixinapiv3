@@ -6,6 +6,23 @@ use laocc\weiPay\ApiV3Base;
 
 class Complaint extends ApiV3Base
 {
+
+    public function notify(string $json)
+    {
+        $value = $this->notifyDecrypt($json);
+        if (is_string($value)) return $value;
+        $this->debug([$json, $value]);
+
+        $param = [];
+        $param['complainted_mchid'] = $value['mchid'];
+        $param['response_content'] = $value['content'];
+//        $param['response_images'] = [];
+        $data = $this->post("/v3/merchant-service/complaints-v2/{$value['complaint_id']}/response", $param, ['type' => 'post', 'returnCode' => true]);
+        if (is_string($data)) return $data;
+
+        return $value;
+    }
+
     /**
      * 投诉回调
      *
@@ -45,16 +62,5 @@ class Complaint extends ApiV3Base
         return $data;
     }
 
-
-    public function reply(array $params)
-    {
-        $param = [];
-        $param['complainted_mchid'] = $params['mchid'];
-        $param['response_content'] = $params['content'];
-//        $param['response_images'] = [];
-        $data = $this->post("/v3/merchant-service/complaints-v2/{$params['complaint_id']}/response", $param, ['type' => 'post', 'returnCode' => true]);
-        if (is_string($data)) return $data;
-        return $data === 204;
-    }
 
 }

@@ -187,10 +187,10 @@ class Pay extends ApiV3Base implements PayFace
             return '商户订单号或微信订单号至少要提供一个';
         }
 
-        if (empty($params['waybill'])) {
-            $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$params['number']}", $param);
-        } else {
+        if ($params['waybill'] ?? '') {
             $data = $this->get("/v3/pay/partner/transactions/id/{$params['waybill']}", $param);
+        } else {
+            $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$params['number']}", $param);
         }
         if (is_string($data)) return $data;
 

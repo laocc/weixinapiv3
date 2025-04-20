@@ -167,7 +167,7 @@ class Pay extends ApiV3Base implements PayFace
         $param = [];
         $param['mchid'] = $this->entity->mchID;
 
-        if (isset($params['waybill'])) {
+        if ($params['waybill'] ?? '') {
             $data = $this->get("/v3/pay/transactions/id/{$params['waybill']}", $param);
 
         } else {

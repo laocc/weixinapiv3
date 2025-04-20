@@ -29,9 +29,9 @@ class Complaint
     }
 
 
-    public function reply(array $params): bool|string
+    public function notify(string $json): bool|string
     {
-        return $this->createComplaint()->reply($params);
+        return $this->createComplaint()->notify($json);
     }
 
 
