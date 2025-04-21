@@ -4,6 +4,8 @@ namespace laocc\weiPay\auto;
 
 use laocc\weiPay\library\Entity;
 use laocc\weiPay\library\PayFace;
+use laocc\weiPay\service\Pay as sPay;
+use laocc\weiPay\merchant\Pay as mPay;
 
 class Pay implements PayFace
 {
@@ -14,23 +16,22 @@ class Pay implements PayFace
         $this->entity = $entity;
     }
 
-    private function createPay()
+    private function createPay(): sPay|mPay
     {
         if ($this->entity->service) {
-            return new \laocc\weiPay\service\Pay($this->entity);
+            return new sPay($this->entity);
         } else {
-            return new \laocc\weiPay\merchant\Pay($this->entity);
+            return new mPay($this->entity);
         }
     }
 
     /**
      * 受理通知数据，验签，并解密
-     * @param string $json
      * @return array|string
      */
-    public function notify(string $json): array|string
+    public function notify(): array|string
     {
-        return $this->createPay()->notify($json);
+        return $this->createPay()->notify();
     }
 
 

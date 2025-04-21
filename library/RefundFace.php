@@ -10,6 +10,6 @@ interface RefundFace
 
     public function query(array $params): array|string;
 
-    public function notify(string $json): array|string;
+    public function notify(): array|string;
 
 }

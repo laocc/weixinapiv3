@@ -202,33 +202,28 @@ abstract class ApiV3Base extends Library
 
     /**
      * 受理通知数据，验签，并解密
-     * @param string|null $json
      * @return mixed|string
      */
-    protected function notifyDecrypt(string $json = null)
+    protected function notifyDecrypt()
     {
         $serial = getenv('HTTP_WECHATPAY_SERIAL');
         $time = getenv('HTTP_WECHATPAY_TIMESTAMP');
         $nonce = getenv('HTTP_WECHATPAY_NONCE');
         $sign = getenv('HTTP_WECHATPAY_SIGNATURE');
-        if (is_null($json)) $json = file_get_contents('php://input');
+        $json = file_get_contents('php://input');
 
         $message = "{$time}\n{$nonce}\n{$json}\n";
         if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
             $cert = "{$this->entity->publicPath}/{$serial}/public.pem";
-            if (!is_readable($cert)) $cert = $this->entity->publicFile;
+            if (!is_readable($cert)) return "微信公钥证书{$serial}不存在";
             $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
         }
         $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
         if ($chk !== 1) return "wxAPIv3 Sign Error";
 
-        if (preg_match('/\{.+\}/', $json)) {
-            $data = json_decode($json, true);
-        } else {
-            $data = xml_decode($json, true);
-        }
+        $data = json_decode($json, true);
         if (empty($data)) return '未接收到数据';
 
         $value = $this->decryptToString($this->entity->certKey,

@@ -7,11 +7,10 @@ use laocc\weiPay\ApiV3Base;
 class Complaint extends ApiV3Base
 {
 
-    public function notify(string $json)
+    public function notify()
     {
-        $value = $this->notifyDecrypt($json);
+        $value = $this->notifyDecrypt();
         if (is_string($value)) return $value;
-        $this->debug([$json, $value]);
 
         $param = [];
         $param['complainted_mchid'] = $value['mchid'];

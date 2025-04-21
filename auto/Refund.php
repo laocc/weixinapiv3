@@ -4,6 +4,8 @@ namespace laocc\weiPay\auto;
 
 use laocc\weiPay\library\Entity;
 use laocc\weiPay\library\RefundFace;
+use laocc\weiPay\service\Refund as sRefund;
+use laocc\weiPay\merchant\Refund as mRefund;
 
 class Refund implements RefundFace
 {
@@ -14,18 +16,18 @@ class Refund implements RefundFace
         $this->entity = $entity;
     }
 
-    private function createRefund()
+    private function createRefund(): sRefund|mRefund
     {
         if ($this->entity->service) {
-            return new \laocc\weiPay\service\Refund($this->entity);
+            return new sRefund($this->entity);
         } else {
-            return new \laocc\weiPay\merchant\Refund($this->entity);
+            return new mRefund($this->entity);
         }
     }
 
-    public function notify(string $json): array|string
+    public function notify(): array|string
     {
-        return $this->createRefund()->notify($json);
+        return $this->createRefund()->notify();
     }
 
 

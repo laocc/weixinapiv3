@@ -3,6 +3,8 @@
 namespace laocc\weiPay\auto;
 
 use laocc\weiPay\library\Entity;
+use laocc\weiPay\service\Complaint as sComplaint;
+use laocc\weiPay\merchant\Complaint as mComplaint;
 
 class Complaint
 {
@@ -13,19 +15,19 @@ class Complaint
         $this->entity = $entity;
     }
 
-    private function createComplaint()
+    private function createComplaint(): sComplaint|mComplaint
     {
         if ($this->entity->service) {
-            return new \laocc\weiPay\service\Complaint($this->entity);
+            return new sComplaint($this->entity);
         } else {
-            return new \laocc\weiPay\merchant\Complaint($this->entity);
+            return new mComplaint($this->entity);
         }
     }
 
 
-    public function notify(string $json): array|string
+    public function notify(): array|string
     {
-        return $this->createComplaint()->notify($json);
+        return $this->createComplaint()->notify();
     }
 
     public function notifyUrl(string $method, string $url = null)

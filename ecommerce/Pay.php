@@ -10,9 +10,9 @@ use function esp\helper\str_rand;
 class Pay extends ApiV3Base implements PayFace
 {
 
-    public function notify(string $json): array|string
+    public function notify(): array|string
     {
-        $value = $this->notifyDecrypt($json);
+        $value = $this->notifyDecrypt();
         if (is_string($value)) return $value;
 
         $params = [];

@@ -12,14 +12,10 @@ class Entity
 {
     public string $mchID;
     public string $appID;
-    public string $certKey;
+
+    public string $certKey;//私钥Key和证书串号
     public string $certSerial;
-    public string $certFile;
 
-    public string $publicSerial;
-    public string $publicFile;
-
-    public string $privatePath = '';
     public string $publicPath = '';
 
     public array $merchant;//子商户
@@ -29,8 +25,6 @@ class Entity
     public mixed $certEncrypt;
 
     /**
-     * 可以自行引用此类并实现此类的相关方法
-     *
      * Entity constructor.
      * @param array $conf
      */
@@ -43,65 +37,66 @@ class Entity
         if (!$this->appID) throw new Error("传入数据需要含有微信支付商户appID");
 
         if (is_array($conf['merchant'] ?? '')) {
-
             $this->service = ($conf['ecommerce'] ?? 0) ? 2 : 1;
-
             $this->merchant = [
                 'mchid' => $conf['merchant']['mchid'] ?? '',
                 'appid' => $conf['merchant']['appid'] ?? '',
             ];
-
         } else {
             $this->service = 0;
         }
 
-        $this->publicSerial = $conf['publicSerial'];
         $this->certKey = $conf['certKey'] ?? ($conf['key'] ?? ($conf['v3Key'] ?? ''));
         $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
 
         if (isset($conf['cert'])) {
-            $this->privatePath = $conf['cert']['private'] ?? '';
-            $this->publicPath = $conf['cert']['public'] ?? '';
-        } else {
-            if (defined('_CERT')) {
-                if (is_string(_CERT)) {
-                    $this->privatePath = _CERT;
-                    $this->publicPath = _CERT;
-                } else {
-                    $this->privatePath = _CERT['private'] ?? '';
-                    $this->publicPath = _CERT['public'] ?? '';
-                }
+            if (is_string($conf['cert'])) {
+                $privatePath = $conf['cert'];
+                $publicPath = $conf['cert'];
+            } else {
+                $privatePath = $conf['cert']['private'] ?? '';
+                $publicPath = $conf['cert']['public'] ?? '';
             }
+        } else if (defined('_CERT')) {
+            if (is_string(_CERT)) {
+                $privatePath = _CERT;
+                $publicPath = _CERT;
+            } else {
+                $privatePath = _CERT['private'] ?? '';
+                $publicPath = _CERT['public'] ?? '';
+            }
+        } else {
+            throw new Error('未指定商户私钥证书目录');
         }
-        if (!$this->privatePath) throw new Error('未指定商户私钥证书目录');
-        if (!$this->publicPath) throw new Error('未指定微信公钥证书目录');
 
-        $this->privatePath = rtrim($this->privatePath, '/');
-        $this->publicPath = rtrim($this->publicPath, '/');
-        $this->publicFile = "{$this->publicPath}/{$this->publicSerial}/public.pem";
+        if (!$privatePath) throw new Error('未指定商户私钥证书目录');
+        if (!$publicPath) throw new Error('未指定微信公钥证书目录');
+
+        $privatePath = rtrim($privatePath, '/');
+        $this->publicPath = rtrim($publicPath, '/');
 
         /**
          * 这里用到的密钥是在微信支付后台申请的商户私钥，或服务商私钥
          */
-        $this->certFile = "{$this->privatePath}/{$this->certSerial}/apiclient_key.pem";
-        if (!is_readable($this->certFile)) {
-            $this->certFile = "{$this->privatePath}/{$this->mchID}/apiclient_key.pem";
-            if (!is_readable($this->certFile)) throw new Error("商户证书文件不存在，请检查");
+        $certFile = "{$privatePath}/{$this->certSerial}/apiclient_key.pem";
+        if (!is_readable($certFile)) {
+            $certFile = "{$privatePath}/{$this->mchID}/apiclient_key.pem";
+            if (!is_readable($certFile)) throw new Error("商户证书文件不存在，请检查");
         }
 
-        $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($this->certFile));
+        $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($certFile));
     }
 
     public function __toString()
     {
-        return json_encode([
+        $value = [
+            'service' => $this->service,
             'mchID' => $this->mchID,
             'appID' => $this->appID,
-            'certSerial' => $this->certSerial,
-            'privatePath' => $this->privatePath,
-            'certFile' => $this->certFile,
-            'merchant' => $this->merchant,
-        ], 256 | 64 | 128);
+            'serial' => $this->certSerial,
+        ];
+        if (isset($this->merchant)) $value['merchant'] = $this->merchant;
+        return json_encode($value, 256 | 64 | 128);
     }
 
 
