@@ -22,6 +22,7 @@ class Entity
     public array $merchant;//子商户
 
     public int $service = 1;//服务商类型，1直连商户，2普通服务商，4电商服务商
+    public bool $improve = false;//商户性质提升，从二级子商户提升为直接商户
 
     public mixed $certEncrypt;
 
@@ -50,6 +51,7 @@ class Entity
         $this->certKey = $conf['certKey'] ?? ($conf['key'] ?? ($conf['v3Key'] ?? ''));
         $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
         $this->publicSerial = $conf['publicSerial'] ?? ($conf['public'] ?? '');
+        $this->improve = ($conf['improve'] ?? false);
 
         if (isset($conf['cert'])) {
             if (is_string($conf['cert'])) {

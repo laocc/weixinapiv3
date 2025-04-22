@@ -87,7 +87,7 @@ class Crypt
      * @param string $str
      * @return string
      */
-    public function encrypt(string $str)
+    private function encrypt(string $str)
     {
         openssl_public_encrypt($str, $encrypted, $this->public, OPENSSL_PKCS1_OAEP_PADDING);
         return base64_encode($encrypted);
