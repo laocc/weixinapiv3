@@ -49,13 +49,13 @@ class Refund extends ApiV3Base implements RefundFace
     {
         $param = [];
         $param['transaction_id'] = $refund['transaction_id'];
-        $param['out_trade_no'] = $refund['out_trade_no'];
+        if (empty($param['transaction_id'])) $param['out_trade_no'] = $refund['out_trade_no'];
         $param['out_refund_no'] = $refund['out_refund_no'];
-        $param['reason'] = $refund['out_refund_no'] ?? '用户要求退款';
+        $param['reason'] = $refund['reason'] ?? '用户要求退款';
         $param['notify_url'] = $refund['notify'];
 //        $param['funds_account'] = 'AVAILABLE';
         $param['amount'] = [
-            'refund' => $refund['refund'] ?? $refund['total'],
+            'refund' => $refund['amount'],
             'total' => $refund['total'],
             'currency' => 'CNY',
         ];

@@ -16,7 +16,7 @@ class Entity
     public string $certKey;//私钥Key和证书串号
     public string $certSerial;
 
-    public string $publicPath = '';
+    public string $publicPath;
 
     public array $merchant;//子商户
 
