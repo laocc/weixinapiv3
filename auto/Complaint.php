@@ -30,6 +30,12 @@ class Complaint
         return $this->createComplaint()->notify();
     }
 
+
+    public function reply(array $data): array|string
+    {
+        return $this->createComplaint()->reply($data);
+    }
+
     public function notifyUrl(string $method, string $url = null)
     {
         return $this->createComplaint()->notifyUrl($method, $url);
