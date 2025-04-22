@@ -17,6 +17,7 @@ class Entity
     public string $certSerial;
 
     public string $publicPath;
+    public string $publicSerial;
 
     public array $merchant;//子商户
 
@@ -48,6 +49,7 @@ class Entity
 
         $this->certKey = $conf['certKey'] ?? ($conf['key'] ?? ($conf['v3Key'] ?? ''));
         $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
+        $this->publicSerial = $conf['publicSerial'] ?? ($conf['public'] ?? '');
 
         if (isset($conf['cert'])) {
             if (is_string($conf['cert'])) {
@@ -94,6 +96,7 @@ class Entity
             'mchID' => $this->mchID,
             'appID' => $this->appID,
             'serial' => $this->certSerial,
+            'public' => $this->publicSerial,
         ];
         if (isset($this->merchant)) $value['merchant'] = $this->merchant;
         return json_encode($value, 256 | 64 | 128);

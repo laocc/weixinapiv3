@@ -9,17 +9,16 @@ class Complaint extends ApiV3Base
 
     public function notify()
     {
-        $value = $this->notifyDecrypt();
-        if (is_string($value)) return $value;
+        return $this->notifyDecrypt();
+    }
 
+    public function reply(array $data)
+    {
         $param = [];
-        $param['complainted_mchid'] = $value['mchid'];
-        $param['response_content'] = $value['content'];
+        $param['complainted_mchid'] = $data['mchid'];
+        $param['response_content'] = $data['content'];
 //        $param['response_images'] = [];
-        $data = $this->post("/v3/merchant-service/complaints-v2/{$value['complaint_id']}/response", $param, ['type' => 'post', 'returnCode' => true]);
-        if (is_string($data)) return $data;
-
-        return $value;
+        return $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/response", $param, ['type' => 'post', 'returnCode' => true]);
     }
 
     /**
