@@ -7,7 +7,6 @@ use esp\core\Library;
 use esp\http\Http;
 use laocc\weiPay\library\Crypt;
 use laocc\weiPay\library\Entity;
-use function esp\helper\xml_decode;
 
 abstract class ApiV3Base extends Library
 {

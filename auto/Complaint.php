@@ -6,6 +6,9 @@ use laocc\weiPay\library\Entity;
 use laocc\weiPay\service\Complaint as sComplaint;
 use laocc\weiPay\merchant\Complaint as mComplaint;
 
+/**
+ * 投诉管理
+ */
 class Complaint
 {
     protected Entity $entity;
@@ -40,7 +43,6 @@ class Complaint
     {
         return $this->createComplaint()->notifyUrl($method, $url);
     }
-
 
 
 }

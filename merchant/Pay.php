@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace laocc\weiPay\merchant;
 
 use laocc\weiPay\ApiV3Base;
+use laocc\weiPay\library\buildPay;
 use laocc\weiPay\library\PayFace;
 use function esp\helper\str_rand;
 
 class Pay extends ApiV3Base implements PayFace
 {
+
+    use buildPay;
 
     public function notify(): array|string
     {
@@ -58,8 +61,9 @@ class Pay extends ApiV3Base implements PayFace
         $unified = $this->post("/v3/pay/transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
 
-        return $this->paySign($unified['prepay_id'], $this->entity->appID, $time);
+        return $this->jsApiPayID($unified['prepay_id'], $this->entity->appID, $time);
     }
+
 
     public function paySign(string $payPreID, string $appid, int $time = null): array
     {

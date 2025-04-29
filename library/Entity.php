@@ -84,8 +84,9 @@ class Entity
          */
         $certFile = "{$privatePath}/{$this->certSerial}/apiclient_key.pem";
         if (!is_readable($certFile)) {
-            $certFile = "{$privatePath}/{$this->mchID}/apiclient_key.pem";
-            if (!is_readable($certFile)) throw new Error("商户证书文件不存在，请检查");
+            throw new Error("商户证书文件{$certFile}不存在，请检查");
+//            $certFile = "{$privatePath}/{$this->mchID}/apiclient_key.pem";
+//            if (!is_readable($certFile)) throw new Error("商户证书文件不存在，请检查");
         }
 
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($certFile));
