@@ -21,6 +21,7 @@ class Pay extends ApiV3Base implements PayFace
         $params['mchid'] = $value['sub_mchid'];//商户号
         $params['success'] = $value['trade_state'] === 'SUCCESS';
         $params['number'] = $value['out_trade_no'];
+        $params['type'] = $value['trade_type'];
         $params['waybill'] = $value['transaction_id'];
         $params['time'] = strtotime($value['success_time'] ?? '');
         $params['state'] = strtolower(substr($value['trade_state'], -20));
@@ -72,7 +73,7 @@ class Pay extends ApiV3Base implements PayFace
         $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
 
-        return $this->jsApiPayID($unified['prepay_id'], $signAppID, $time);
+        return $this->PayCodeJsAPI($unified['prepay_id'], $time, $signAppID);
     }
 
 
@@ -126,22 +127,7 @@ class Pay extends ApiV3Base implements PayFace
 
         if (is_string($unified)) return $unified;
 
-        /**
-         * 这里组合的是送给前端用的 orderInfo部分内容
-         */
-        $value = array();
-        $value['appid'] = $this->entity->appID;
-        $value['partnerid'] = $this->entity->mchID;
-        $value['prepayid'] = $unified['prepay_id'];
-        $value['package'] = "Sign=WXPay";
-        $value['noncestr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
-        $value['timestamp'] = strval($time);//这timeStamp中间的S必须是大写
-
-        $message = "{$this->entity->appID}\n{$value['timestamp']}\n{$value['noncestr']}\n{$value['prepayid']}\n";
-        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
-        $value['sign'] = base64_encode($sign);//生成签名
-
-        return $value;
+        return $this->PayCodeForApp($unified['prepay_id'], $time);
     }
 
     /**
@@ -199,6 +185,7 @@ class Pay extends ApiV3Base implements PayFace
         return [
             'mchid' => $data['sub_mchid'],
             'number' => $data['out_trade_no'],
+            'type' => $data['trade_type'],
             'state' => $data['trade_state'],
             'desc' => $data['trade_state_desc'],
             'waybill' => $data['transaction_id'] ?? '',

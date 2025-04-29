@@ -7,22 +7,41 @@ use function esp\helper\str_rand;
 trait buildPay
 {
 
-    private function jsApiPayID(string $payPreID, string $appid, int $time = null): array
+    private function PayCodeJsAPI(string $payPreID, int $time, string $appID = null): array
     {
-        if (is_null($time)) $time = time();
+        if (!$appID) $appID = $this->entity->appID;
 
-        $values = array();
-        $values['appId'] = $appid;
-        $values['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
-        $values['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
-        $values['package'] = "prepay_id={$payPreID}";
-        $values['signType'] = 'RSA';
+        $value = array();
+        $value['appId'] = $appID;
+        $value['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
+        $value['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
+        $value['package'] = "prepay_id={$payPreID}";
+        $value['signType'] = 'RSA';
 
-        $message = "{$appid}\n{$values['timeStamp']}\n{$values['nonceStr']}\n{$values['package']}\n";
+        $message = "{$appID}\n{$value['timeStamp']}\n{$value['nonceStr']}\n{$value['package']}\n";
         openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
-        $values['paySign'] = base64_encode($sign);//生成签名
+        $value['paySign'] = base64_encode($sign);//生成签名
 
-        return $values;
+        return $value;
+    }
+
+    private function PayCodeForApp(string $payPreID, int $time, string $appID = null)
+    {
+        if (!$appID) $appID = $this->entity->appID;
+
+        $value = array();
+        $value['appId'] = $appID;
+        $value['partnerId'] = $this->entity->mchID;
+        $value['prepayId'] = $payPreID;
+        $value['packageValue'] = "Sign=WXPay";
+        $value['nonceStr'] = str_rand(30);//随机字符串，不长于32位。推荐随机数生成算法
+        $value['timeStamp'] = strval($time);//这timeStamp中间的S必须是大写
+
+        $message = "{$appID}\n{$value['timeStamp']}\n{$value['nonceStr']}\n{$value['partnerId']}\n";
+        openssl_sign($message, $sign, $this->entity->certEncrypt, 'sha256WithRSAEncryption');
+        $value['sign'] = base64_encode($sign);//生成签名
+
+        return $value;
     }
 
 }

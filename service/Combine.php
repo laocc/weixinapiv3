@@ -83,7 +83,7 @@ class Combine extends ApiV3Base implements PayFace
         $unified = $this->post("/v3/combine-transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
 
-        return $this->jsApiPayID($unified['prepay_id'], $this->entity->appID, $time);
+        return $this->PayCodeJsAPI($unified['prepay_id'], $time);
     }
 
 
