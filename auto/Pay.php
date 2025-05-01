@@ -4,6 +4,8 @@ namespace laocc\weiPay\auto;
 
 use laocc\weiPay\library\Entity;
 use laocc\weiPay\library\PayFace;
+
+use laocc\weiPay\ecommerce\Pay as ePay;
 use laocc\weiPay\service\Pay as sPay;
 use laocc\weiPay\merchant\Pay as mPay;
 
@@ -18,6 +20,7 @@ class Pay implements PayFace
 
     private function createPay(): sPay|mPay
     {
+        //服务商类型，1直连商户，2普通服务商，4电商服务商
         if ($this->entity->service) {
             return new sPay($this->entity);
         } else {

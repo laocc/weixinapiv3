@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace laocc\weiPay\service;
+
 use laocc\weiPay\ApiV3Base;
 
 
@@ -17,10 +18,10 @@ class Media extends ApiV3Base
     {
         if (!is_readable($filePath)) return "要上传的文件({$filePath})不存在";
         $fileSize = \filesize($filePath);
-        $mimeType = finfo_file(finfo_open(FILEINFO_EXTENSION), $filePath);
+        $mimeType = \finfo_file(\finfo_open(FILEINFO_EXTENSION), $filePath);
         $ext = explode('/', $mimeType)[0];
         if ($ext === '???') {
-            $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $filePath);
+            $mimeType = \finfo_file(\finfo_open(FILEINFO_MIME_TYPE), $filePath);
             $ext = explode('/', $mimeType);
             $ext = $ext[1];
         }
@@ -45,7 +46,7 @@ class Media extends ApiV3Base
     private function uploadWx(string $api, string $filePath)
     {
         $basename = \basename($filePath);
-        $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $filePath);
+        $mimeType = \finfo_file(\finfo_open(FILEINFO_MIME_TYPE), $filePath);
 
         $meta = json_encode(['filename' => $basename, 'sha256' => hash_file('sha256', $filePath)]);
         $boundary = sha1(uniqid('', true));
