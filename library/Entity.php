@@ -10,8 +10,8 @@ use esp\error\Error;
  */
 class Entity
 {
-    public string $mchID;
-    public string $appID;
+    public string $mchID;//微信商户号
+    public string $appID;//APPID
 
     public string $certKey;//私钥Key和证书串号
     public string $certSerial;
@@ -21,7 +21,7 @@ class Entity
 
     public array $merchant;//子商户
 
-    public int $service = 1;//服务商类型，1直连商户，2普通服务商，4电商服务商
+    public int $service = 1;//服务商类型，1直连商户，2普通服务商，4电商服务商，32自建支付中心
     public bool $improve = false;//商户性质提升，从二级子商户提升为直接商户
 
     public mixed $certEncrypt;
@@ -38,14 +38,17 @@ class Entity
         $this->appID = $conf['appid'] ?? ($conf['appID'] ?? ($conf['appId'] ?? ''));
         if (!$this->appID) throw new Error("传入数据需要含有微信支付商户appID");
 
-        if (is_array($conf['merchant'] ?? '')) {
-            $this->service = ($conf['ecommerce'] ?? 0) ? 2 : 1;
+        if ($conf['custom'] ?? 0) {
+            $this->service = 32;
+
+        } else if (is_array($conf['merchant'] ?? '')) {
+            $this->service = ($conf['ecommerce'] ?? 0) ? 4 : 2;
             $this->merchant = [
                 'mchid' => $conf['merchant']['mchid'] ?? '',
                 'appid' => $conf['merchant']['appid'] ?? '',
             ];
         } else {
-            $this->service = 0;
+            $this->service = 1;
         }
 
         $this->certKey = $conf['certKey'] ?? ($conf['key'] ?? ($conf['v3Key'] ?? ''));
@@ -85,8 +88,6 @@ class Entity
         $certFile = "{$privatePath}/{$this->certSerial}/apiclient_key.pem";
         if (!is_readable($certFile)) {
             throw new Error("商户证书文件{$certFile}不存在，请检查");
-//            $certFile = "{$privatePath}/{$this->mchID}/apiclient_key.pem";
-//            if (!is_readable($certFile)) throw new Error("商户证书文件不存在，请检查");
         }
 
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($certFile));

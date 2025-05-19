@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace laocc\weiPay\library;
 
 use esp\error\Error;
+use OpenSSLAsymmetricKey;
 
 /**
  * 数据加解密
@@ -13,9 +14,9 @@ use esp\error\Error;
  */
 class Crypt
 {
-    private string $serial;
-    private $cert;
-    private $public;
+    private string $serial;//证书号
+    private OpenSSLAsymmetricKey $cert;
+    private OpenSSLAsymmetricKey $public;
 
     public function __construct(string $certSerial, string $certPath = null)
     {
@@ -31,10 +32,14 @@ class Crypt
         }
         if (!$certPath) throw new Error('未指定证书目录');
         $certPath = rtrim($certPath, '/');
-        $this->serial = $certSerial;
+        $this->serial = $certSerial;//证书序列号
         if (!is_readable("{$certPath}/{$certSerial}")) throw new Error("证书目录{$certPath}/{$certSerial}不存在或不可读");
-        $this->cert = openssl_get_privatekey(file_get_contents("{$certPath}/{$certSerial}/cert.pem"));
-        $this->public = openssl_get_publickey(file_get_contents("{$certPath}/{$certSerial}/public.pem"));
+        $cert = openssl_get_privatekey(file_get_contents("{$certPath}/{$certSerial}/cert.pem"));
+        $public = openssl_get_publickey(file_get_contents("{$certPath}/{$certSerial}/public.pem"));
+        if (!$cert) throw new Error("商户私钥错误");
+        if (!$public) throw new Error("商户公钥错误");
+        $this->cert = $cert;
+        $this->public = $public;
     }
 
     public function serial()

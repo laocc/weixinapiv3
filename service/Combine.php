@@ -58,6 +58,7 @@ class Combine extends ApiV3Base implements PayFace
         $data['sub_orders'] = [];
 
         foreach ($params['pay'] as $pay) {
+            $order = [];
             $order['mchid'] = $this->entity->mchID;
             $order['sub_mchid'] = $this->entity->merchant['mchid'];
             $order['sub_appid'] = $this->entity->merchant['appid'];

@@ -1,16 +1,46 @@
 <?php
 declare(strict_types=1);
 
-namespace laocc\weiPay\merchant;
+namespace laocc\weiPay\custom;
 
-use laocc\weiPay\ApiV3Base;
 use laocc\weiPay\library\buildPay;
 use laocc\weiPay\library\PayFace;
 use function esp\helper\str_rand;
 
-class Pay extends ApiV3Base implements PayFace
+class Pay extends Base implements PayFace
 {
+
     use buildPay;
+
+    /**
+     * 发起公众号、小程序支付
+     *
+     * @param array $params
+     * @return array|string
+     */
+    public function jsapi(array $params): array|string
+    {
+        $time = time();
+        $data = [];
+
+        $data['type'] = 'jsapi';
+        $data['appid'] = $this->entity->appID;
+
+        $data['subject'] = $params['subject'] ?? $params['description'];
+        $data['number'] = strval($params['number']);
+        $data['ttl'] = $params['ttl'];
+        $data['notify'] = $params['notify'];
+        $data['sharing'] = boolval($params['sharing'] ?? 0);//分账
+        $data['total'] = $params['fee'];
+        $data['openid'] = $params['openid'];
+        $data['order'] = [...$params['pay']];
+
+        $unified = $this->post("/gateway/order/", $data);
+        if (is_string($unified)) return $unified;
+
+        return $this->PayCodeJsAPI($unified['prepay_id'], $time);
+    }
+
 
     public function notify(): array|string
     {
@@ -27,43 +57,6 @@ class Pay extends ApiV3Base implements PayFace
         $params['amount'] = intval($value['amount']['total']);
         return $params;
     }
-
-    /**
-     * 发起公众号、小程序支付
-     *
-     * @param array $params
-     * @return array|string
-     */
-    public function jsapi(array $params): array|string
-    {
-        $time = time();
-        $data = [];
-
-        $data['appid'] = $this->entity->appID;
-        $data['mchid'] = $this->entity->mchID;
-
-        $data['description'] = $params['subject'] ?? $params['description'];
-        $data['out_trade_no'] = strval($params['number']);
-        $data['time_expire'] = date(DATE_RFC3339, $time + ($params['ttl'] ?? 7200));
-        $data['attach'] = $params['attach'];
-        $data['notify_url'] = $params['notify'];
-
-        $data['settle_info'] = [];
-        $data['settle_info']['profit_sharing'] = boolval($params['sharing'] ?? 0);//分账
-
-        $data['amount'] = [];
-        $data['amount']['total'] = $params['fee'];
-        $data['amount']['currency'] = 'CNY';
-
-        $data['payer'] = [];
-        $data['payer']['openid'] = $params['openid'];
-        $unified = $this->post("/v3/pay/transactions/jsapi", $data);
-        if (is_string($unified)) return $unified;
-
-        return $this->PayCodeJsAPI($unified['prepay_id'], $time);
-    }
-
-
 
 
     /**
@@ -135,16 +128,9 @@ class Pay extends ApiV3Base implements PayFace
      */
     public function query(array $params): array|string
     {
-        $param = [];
-        $param['mchid'] = $this->entity->mchID;
-
-        if ($params['waybill'] ?? '') {
-            $data = $this->get("/v3/pay/transactions/id/{$params['waybill']}", $param);
-
-        } else {
-            $data = $this->get("/v3/pay/transactions/out-trade-no/{$params['number']}", $param);
-        }
-
+        $post = [];
+        $post['waybill'] = $params['waybill'];
+        $data = $this->post("/gateway/query/", $post);
         if (is_string($data)) return $data;
 
         return [

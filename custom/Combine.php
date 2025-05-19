@@ -1,6 +1,6 @@
 <?php
 
-namespace laocc\weiPay\merchant;
+namespace laocc\weiPay\custom;
 
 use laocc\weiPay\ApiV3Base;
 use laocc\weiPay\library\buildPay;
@@ -9,7 +9,7 @@ use laocc\weiPay\library\PayFace;
 /**
  * 合单支付
  */
-class Combine extends ApiV3Base implements PayFace
+class Combine extends Base implements PayFace
 {
     use buildPay;
 
@@ -82,7 +82,7 @@ class Combine extends ApiV3Base implements PayFace
         $unified = $this->post("/v3/combine-transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
 
-        return $this->PayCodeJsAPI($unified['prepay_id'],  $time);
+        return $this->PayCodeJsAPI($unified['prepay_id'], $time);
     }
 
 
