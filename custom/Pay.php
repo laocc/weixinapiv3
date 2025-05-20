@@ -31,7 +31,7 @@ class Pay extends Base implements PayFace
         $data['ttl'] = $params['ttl'];
         $data['notify'] = $params['notify'];
         $data['sharing'] = boolval($params['sharing'] ?? 0);//分账
-        $data['total'] = $params['fee'];
+        $data['total'] = $params['total'];
         $data['openid'] = $params['openid'];
         $data['order'] = [...$params['pay']];
 

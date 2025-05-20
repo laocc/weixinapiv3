@@ -53,7 +53,7 @@ class Pay extends ApiV3Base implements PayFace
         $data['settle_info']['profit_sharing'] = $params['sharing'] ?? true;
 
         $data['amount'] = [];
-        $data['amount']['total'] = $params['amount'];
+        $data['amount']['total'] = $params['total'];
         $data['amount']['currency'] = 'CNY';
 
         $data['payer'] = [];

@@ -2,7 +2,6 @@
 
 namespace laocc\weiPay\custom;
 
-use laocc\weiPay\ApiV3Base;
 use laocc\weiPay\library\buildPay;
 use laocc\weiPay\library\PayFace;
 
@@ -79,7 +78,7 @@ class Combine extends Base implements PayFace
 
         $data['combine_payer_info'] = [];
         $data['combine_payer_info']['openid'] = $params['openid'];
-        $unified = $this->post("/v3/combine-transactions/jsapi", $data);
+        $unified = $this->post("/gateway/order/", $data);
         if (is_string($unified)) return $unified;
 
         return $this->PayCodeJsAPI($unified['prepay_id'], $time);
@@ -92,7 +91,10 @@ class Combine extends Base implements PayFace
      */
     public function query(array $params): array|string
     {
-        $data = $this->get("/v3/combine-transactions/out-trade-no/{$params['number']}");
+        $post = [
+            'number' => $params['number'],
+        ];
+        $data = $this->post("/gateway/query/", $post);
 
         if (is_string($data)) return $data;
         $value = [

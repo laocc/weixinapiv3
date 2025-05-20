@@ -54,13 +54,13 @@ class Combine extends ApiV3Base implements PayFace
 
         $data['combine_appid'] = $this->entity->appID;
         $data['combine_mchid'] = $this->entity->mchID;
-        $data['combine_out_trade_no'] = strval($params['pay'][0]['number']);
+        $data['combine_out_trade_no'] = strval($params['number'] ?? $params['pay'][0]['number']);
         $data['sub_orders'] = [];
 
         foreach ($params['pay'] as $pay) {
             $order = [];
             $order['mchid'] = $this->entity->mchID;
-            $order['attach'] = $pay['attach'];
+            $order['attach'] = $pay['attach'] ?? '';
             $order['description'] = $pay['subject'] ?? $pay['description'];
             $order['out_trade_no'] = strval($pay['number']);
 
@@ -68,7 +68,7 @@ class Combine extends ApiV3Base implements PayFace
             $order['settle_info']['profit_sharing'] = boolval($pay['sharing'] ?? 0);//分账
 
             $order['amount'] = [];
-            $order['amount']['total_amount'] = $pay['fee'];
+            $order['amount']['total_amount'] = ($pay['amount'] ?? $pay['fee']);
             $order['amount']['currency'] = 'CNY';
 
             $data['sub_orders'][] = $order;
@@ -82,7 +82,7 @@ class Combine extends ApiV3Base implements PayFace
         $unified = $this->post("/v3/combine-transactions/jsapi", $data);
         if (is_string($unified)) return $unified;
 
-        return $this->PayCodeJsAPI($unified['prepay_id'],  $time);
+        return $this->PayCodeJsAPI($unified['prepay_id'], $time);
     }
 
 

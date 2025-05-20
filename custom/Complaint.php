@@ -2,7 +2,6 @@
 
 namespace laocc\weiPay\custom;
 
-use laocc\weiPay\ApiV3Base;
 
 class Complaint extends Base
 {
@@ -14,11 +13,7 @@ class Complaint extends Base
 
     public function reply(array $data)
     {
-        $param = [];
-        $param['complainted_mchid'] = $data['mchid'];
-        $param['response_content'] = $data['content'];
-//        $param['response_images'] = [];
-        return $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/response", $param, ['type' => 'post', 'returnCode' => true]);
+        return '无此接口';
     }
 
     /**
@@ -33,31 +28,7 @@ class Complaint extends Base
 
     public function notifyUrl(string $action, string $url = null)
     {
-        $comApi = '/v3/merchant-service/complaint-notifications';
-
-        switch ($action) {
-            case 'get':
-                $data = $this->get($comApi);
-                break;
-            case 'set':
-                $param = [];
-                $param['url'] = $url;
-                $data = $this->post($comApi, $param, ['type' => 'post']);
-                break;
-            case 'update':
-                $param = [];
-                $param['url'] = $url;
-                $data = $this->post($comApi, $param, ['type' => 'put']);
-                break;
-            case 'delete':
-                $data = $this->get($comApi, null, ['type' => 'delete']);
-                break;
-            default:
-                return '';
-        }
-        if (is_string($data)) return $data;
-
-        return $data;
+        return '无此接口';
     }
 
 

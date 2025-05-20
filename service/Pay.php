@@ -57,7 +57,7 @@ class Pay extends ApiV3Base implements PayFace
         $data['settle_info']['profit_sharing'] = $params['sharing'] ?? false;
 
         $data['amount'] = [];
-        $data['amount']['total'] = $params['fee'];
+        $data['amount']['total'] = $params['total'] ?? ($params['amount'] ?? $params['fee']);
         $data['amount']['currency'] = 'CNY';
 
         $signAppID = $this->entity->appID;
@@ -120,7 +120,7 @@ class Pay extends ApiV3Base implements PayFace
         $data['settle_info']['profit_sharing'] = boolval($params['sharing'] ?? 0);//分账
 
         $data['amount'] = [];
-        $data['amount']['total'] = $params['fee'];
+        $data['amount']['total'] = $params['total'] ?? ($params['amount'] ?? $params['fee']);
         $data['amount']['currency'] = 'CNY';
 
         $unified = $this->post("/v3/pay/partner/transactions/app", $data);
