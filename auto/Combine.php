@@ -8,7 +8,6 @@ use laocc\weiPay\library\PayFace;
 use laocc\weiPay\ecommerce\Combine as eCombine;
 use laocc\weiPay\merchant\Combine as mCombine;
 use laocc\weiPay\service\Combine as sCombine;
-use laocc\weiPay\custom\Combine as cCombine;
 
 /**
  * 合单支付
@@ -23,14 +22,13 @@ class Combine implements PayFace
         $this->entity = $entity;
     }
 
-    private function createPay(): mCombine|sCombine|eCombine|cCombine
+    private function createPay(): mCombine|sCombine|eCombine
     {
         //服务商类型，1直连商户，2普通服务商，4电商服务商，32自建支付中心
         return match ($this->entity->service) {
             1 => new mCombine($this->entity),
             2 => new sCombine($this->entity),
             4 => new eCombine($this->entity),
-            32 => new cCombine($this->entity),
             default => throw new Error("未知商户类型{$this->entity->service}"),
         };
     }

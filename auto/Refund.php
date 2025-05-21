@@ -9,7 +9,6 @@ use laocc\weiPay\library\RefundFace;
 use laocc\weiPay\ecommerce\Refund as eRefund;
 use laocc\weiPay\service\Refund as sRefund;
 use laocc\weiPay\merchant\Refund as mRefund;
-use laocc\weiPay\custom\Refund as cRefund;
 
 class Refund implements RefundFace
 {
@@ -20,14 +19,13 @@ class Refund implements RefundFace
         $this->entity = $entity;
     }
 
-    private function createRefund(): sRefund|mRefund|cRefund|eRefund
+    private function createRefund(): sRefund|mRefund|eRefund
     {
         //服务商类型，1直连商户，2普通服务商，4电商服务商，32自建支付中心
         return match ($this->entity->service) {
             1 => new mRefund($this->entity),
             2 => new sRefund($this->entity),
             4 => new eRefund($this->entity),
-            32 => new cRefund($this->entity),
             default => throw new Error("未知商户类型{$this->entity->service}"),
         };
     }

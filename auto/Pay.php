@@ -9,7 +9,6 @@ use laocc\weiPay\library\PayFace;
 use laocc\weiPay\ecommerce\Pay as ePay;
 use laocc\weiPay\service\Pay as sPay;
 use laocc\weiPay\merchant\Pay as mPay;
-use laocc\weiPay\custom\Pay as cPay;
 
 class Pay implements PayFace
 {
@@ -20,14 +19,13 @@ class Pay implements PayFace
         $this->entity = $entity;
     }
 
-    private function createPay(): sPay|mPay|cPay|ePay
+    private function createPay(): sPay|mPay|ePay
     {
         //服务商类型，1直连商户，2普通服务商，4电商服务商，32自建支付中心
         return match ($this->entity->service) {
             1 => new mPay($this->entity),
             2 => new sPay($this->entity),
             4 => new ePay($this->entity),
-            32 => new cPay($this->entity),
             default => throw new Error("未知商户类型{$this->entity->service}"),
         };
     }

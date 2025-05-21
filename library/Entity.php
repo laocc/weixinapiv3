@@ -38,10 +38,7 @@ class Entity
         $this->appID = $conf['appid'] ?? ($conf['appID'] ?? ($conf['appId'] ?? ''));
         if (!$this->appID) throw new Error("传入数据需要含有微信支付商户appID");
 
-        if ($conf['custom'] ?? 0) {
-            $this->service = 32;
-
-        } else if (is_array($conf['merchant'] ?? '')) {
+        if (is_array($conf['merchant'] ?? '')) {
             $this->service = ($conf['ecommerce'] ?? 0) ? 4 : 2;
             $this->merchant = [
                 'mchid' => $conf['merchant']['mchid'] ?? '',
