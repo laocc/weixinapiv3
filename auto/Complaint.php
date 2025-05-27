@@ -13,6 +13,7 @@ use laocc\weiPay\merchant\Complaint as mComplaint;
 class Complaint
 {
     protected Entity $entity;
+    private sComplaint|mComplaint $complaint;
 
     public function __construct(Entity $entity)
     {
@@ -21,11 +22,15 @@ class Complaint
 
     private function createComplaint(): sComplaint|mComplaint
     {
+        if (isset($this->complaint)) return $this->complaint;
+
         if ($this->entity->service) {
-            return new sComplaint($this->entity);
+            $this->complaint = new sComplaint($this->entity);
         } else {
-            return new mComplaint($this->entity);
+            $this->complaint = new mComplaint($this->entity);
         }
+
+        return $this->complaint;
     }
 
     /**
@@ -49,6 +54,11 @@ class Complaint
     public function download(array $data): array|string
     {
         return $this->createComplaint()->download($data);
+    }
+
+    public function image(array $data): array|string
+    {
+        return $this->createComplaint()->image($data);
     }
 
     public function history(array $data): array|string

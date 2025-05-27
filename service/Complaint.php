@@ -40,6 +40,11 @@ class Complaint extends ApiV3Base
         return $this->get("/v3/merchant-service/complaints-v2/{$data['id']}/", null, ['type' => 'get']);
     }
 
+    public function image(array $data)
+    {
+        return $this->get("/v3/merchant-service/images/{$data['media_id']}/", null, ['type' => 'get']);
+    }
+
     public function history(array $data)
     {
         $param = [];

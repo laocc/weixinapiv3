@@ -16,6 +16,7 @@ class Combine implements PayFace
 {
 
     protected Entity $entity;
+    private mCombine|sCombine|eCombine $combine;
 
     public function __construct(Entity $entity)
     {
@@ -24,13 +25,16 @@ class Combine implements PayFace
 
     private function createPay(): mCombine|sCombine|eCombine
     {
+        if (isset($this->combine)) return $this->combine;
+
         //服务商类型，1直连商户，2普通服务商，4电商服务商，32自建支付中心
-        return match ($this->entity->service) {
+        $this->combine = match ($this->entity->service) {
             1 => new mCombine($this->entity),
             2 => new sCombine($this->entity),
             4 => new eCombine($this->entity),
-            default => throw new Error("未知商户类型{$this->entity->service}"),
         };
+
+        return $this->combine;
     }
 
     /**
