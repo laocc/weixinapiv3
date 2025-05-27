@@ -21,6 +21,33 @@ class Complaint extends ApiV3Base
         return $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/response", $param, ['type' => 'post', 'returnCode' => true]);
     }
 
+    public function download(array $data)
+    {
+        $time = $data['time'] ?? (strtotime('-29 day'));
+        $begin = date('Y-m-d', $time);
+        $end = date('Y-m-d', ($time + (86400 * 30)));
+        $param = [];
+        $param['limit'] = 50;
+        $param['offset'] = $data['offset'] ?? 0;
+        $param['begin_date'] = $begin;
+        $param['end_date'] = $end;
+        if (isset($data['mchid'])) $param['complainted_mchid'] = $data['mchid'];
+        return $this->get("/v3/merchant-service/complaints-v2", $param, ['type' => 'get']);
+    }
+
+    public function read(array $data)
+    {
+        return $this->get("/v3/merchant-service/complaints-v2/{$data['id']}/", null, ['type' => 'get']);
+    }
+
+    public function history(array $data)
+    {
+        $param = [];
+        $param['limit'] = 300;
+        $param['offset'] = 0;
+        return $this->get("/v3/merchant-service/complaints-v2/{$data['id']}/negotiation-historys", $param, ['type' => 'get']);
+    }
+
     /**
      * 投诉回调
      *

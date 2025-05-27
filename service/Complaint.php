@@ -23,7 +23,7 @@ class Complaint extends ApiV3Base
 
     public function download(array $data)
     {
-        $time = $data['time'] ?? (strtotime('-30 day'));
+        $time = $data['time'] ?? (strtotime('-29 day'));
         $begin = date('Y-m-d', $time);
         $end = date('Y-m-d', ($time + (86400 * 30)));
         $param = [];
