@@ -2,6 +2,7 @@
 
 namespace laocc\weiPay\auto;
 
+use esp\error\Error;
 use laocc\weiPay\library\Entity;
 use laocc\weiPay\service\Complaint as sComplaint;
 use laocc\weiPay\merchant\Complaint as mComplaint;
@@ -27,12 +28,38 @@ class Complaint
         }
     }
 
+    /**
+     * 解密
+     *
+     * @param string $ciphertext
+     * @return string
+     * @throws Error
+     */
+    public function decryptedCipher(string $ciphertext): string
+    {
+        return $this->entity->decryptedCipher($ciphertext);
+    }
 
     public function notify(): array|string
     {
         return $this->createComplaint()->notify();
     }
 
+
+    public function download(array $data): array|string
+    {
+        return $this->createComplaint()->download($data);
+    }
+
+    public function history(array $data): array|string
+    {
+        return $this->createComplaint()->history($data);
+    }
+
+    public function read(array $data): array|string
+    {
+        return $this->createComplaint()->read($data);
+    }
 
     public function reply(array $data): array|string
     {

@@ -42,6 +42,18 @@ class Combine implements PayFace
         return $this->createPay()->notify();
     }
 
+    /**
+     * 解密
+     *
+     * @param string $ciphertext
+     * @return string
+     * @throws Error
+     */
+    public function decryptedCipher(string $ciphertext): string
+    {
+        return $this->entity->decryptedCipher($ciphertext);
+    }
+
 
     /**
      * app支付

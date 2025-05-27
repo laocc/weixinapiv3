@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace laocc\weiPay\library;
 
 use esp\error\Error;
+use Exception;
 
 /**
  * 服务器，或直连商户，身份构造
@@ -103,5 +104,37 @@ class Entity
         return json_encode($value, 256 | 64 | 128);
     }
 
+    /**
+     * 解密
+     *
+     * @param string $ciphertext
+     * @return string
+     * @throws Error
+     */
+    public function decryptedCipher(string $ciphertext): string
+    {
+        $data = base64_decode($ciphertext, true);
+        if ($data === false) {
+            throw new Error("无效的Base64编码字符串");
+        }
+
+        // 执行解密操作
+        $decrypted = '';
+        $success = openssl_private_decrypt(
+            $data,
+            $decrypted,
+            $this->certEncrypt,
+            OPENSSL_PKCS1_OAEP_PADDING // 使用OAEP填充模式
+        );
+
+        // 检查解密结果
+        if (!$success) {
+            $error = openssl_error_string();
+            throw new Error("解密失败: " . $error);
+        }
+
+        // 返回UTF-8编码的明文
+        return $decrypted;
+    }
 
 }

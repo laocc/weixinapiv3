@@ -36,6 +36,18 @@ class Refund implements RefundFace
     }
 
 
+    /**
+     * 解密
+     *
+     * @param string $ciphertext
+     * @return string
+     * @throws Error
+     */
+    public function decryptedCipher(string $ciphertext): string
+    {
+        return $this->entity->decryptedCipher($ciphertext);
+    }
+
     public function query(array $params): array|string
     {
         return $this->createRefund()->query($params);
