@@ -18,14 +18,15 @@ class Complaint extends ApiV3Base
         $param['complainted_mchid'] = $data['mchid'];
         $param['response_content'] = $data['content'];
 //        $param['response_images'] = [];
-        return $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/response", $param, ['type' => 'post', 'returnCode' => true]);
+        $code = $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/response", $param, ['type' => 'post', 'returnCode' => true]);
+        return $code >= 200 and $code < 300;
     }
 
     public function download(array $data)
     {
         $time = $data['time'] ?? (strtotime('-30 day'));
         $begin = date('Y-m-d', $time);
-        $end = date('Y-m-d', (strtotime($begin) + (86400 * 30-1)));
+        $end = date('Y-m-d', (strtotime($begin) + (86400 * 30 - 1)));
         $param = [];
         $param['limit'] = 50;
         $param['offset'] = $data['offset'] ?? 0;

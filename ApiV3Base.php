@@ -131,13 +131,13 @@ abstract class ApiV3Base extends Library
 
         $this->debug($request);
 
+        //只要求返回对方响应状态码
+        if ($option['returnCode'] ?? 0) return (int)$request->info('code');
+
         if ($err = $request->error()) return "Error:{$err}";
 
         //不签名验证
         if (!$this->signCheck) return $request->data();
-
-        //只要求返回对方响应状态码
-        if ($option['returnCode'] ?? 0) return $request->info('code');
 
         $header = $request->header();
         $json = $request->html();
