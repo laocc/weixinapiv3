@@ -133,6 +133,7 @@ abstract class ApiV3Base extends Library
 
         //只要求返回对方响应状态码
         if ($option['returnCode'] ?? 0) return (int)$request->info('code');
+        if ($option['returnHttp'] ?? 0) return $request;
 
         if ($err = $request->error()) return "Error:{$err}";
 

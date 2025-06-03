@@ -71,7 +71,7 @@ class Complaint
         return $this->createComplaint()->read($data);
     }
 
-    public function reply(array $data): array|string
+    public function reply(array $data): array|string|bool
     {
         return $this->createComplaint()->reply($data);
     }

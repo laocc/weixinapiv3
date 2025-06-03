@@ -12,14 +12,17 @@ class Complaint extends ApiV3Base
         return $this->notifyDecrypt();
     }
 
-    public function reply(array $data)
+    public function reply(array $data): bool|string
     {
         $param = [];
         $param['complainted_mchid'] = $data['mchid'];
         $param['response_content'] = $data['content'];
 //        $param['response_images'] = [];
-        $code = $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/response", $param, ['type' => 'post', 'returnCode' => true]);
-        return $code >= 200 and $code < 300;
+        $option = ['type' => 'post', 'returnHttp' => true];
+        $request = $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/response", $param, $option);
+        $code = (int)$request->info('code');
+        if ($code >= 200 and $code < 300) return true;
+        return $request->error();
     }
 
     public function download(array $data)
