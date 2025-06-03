@@ -79,12 +79,12 @@ class Complaint extends ApiV3Base
         return $this->get("/v3/merchant-service/complaints-v2/{$data['id']}/", null, ['type' => 'get']);
     }
 
-    public function image(array $data)
+    public function image(array $data): array|string
     {
-        if (is_string($data['url'])) {
-            return $this->get($data['url'], null, ['type' => 'get']);
-        }
-        return $this->get("/v3/merchant-service/images/{$data['media_id']}/", null, ['type' => 'get']);
+        $option = ['type' => 'get', 'returnHttp' => 1];
+        $image = $this->get("/v3/merchant-service/images/" . urlencode($data['media_id']), null, $option);
+        if ($err = $image->error()) return $err;
+        return ['img' => $image->html()];
     }
 
     public function upload(array $data)
