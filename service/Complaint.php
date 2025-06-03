@@ -83,8 +83,7 @@ class Complaint extends ApiV3Base
     {
         $option = ['type' => 'get', 'returnHttp' => 1];
         $image = $this->get("/v3/merchant-service/images/" . urlencode($data['media_id']), null, $option);
-        if ($err = $image->error()) return $err;
-        return ['img' => $image->html()];
+        return ['src' => 'data:image/png;base64,' . base64_encode($image->html())];
     }
 
     public function upload(array $data)
