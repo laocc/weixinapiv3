@@ -120,6 +120,7 @@ abstract class ApiV3Base extends Library
         $option['headers']['Accept-Language'] = 'zh-CN';
         if ($option['type'] === 'upload') {
             $option['type'] = 'post';
+            $option['headers']['Content-Type'] = "multipart/form-data";
         } else {
             $option['headers']['Content-Type'] = "application/json";
         }

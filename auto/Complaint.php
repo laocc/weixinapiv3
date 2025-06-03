@@ -76,6 +76,16 @@ class Complaint
         return $this->createComplaint()->reply($data);
     }
 
+    public function complete(array $data): array|string|bool
+    {
+        return $this->createComplaint()->complete($data);
+    }
+
+    public function upload(array $data): array|string|bool
+    {
+        return $this->createComplaint()->upload($data);
+    }
+
     public function notifyUrl(string $method, string $url = null)
     {
         return $this->createComplaint()->notifyUrl($method, $url);

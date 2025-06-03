@@ -25,6 +25,41 @@ class Complaint extends ApiV3Base
         return $request->error();
     }
 
+    public function complete(array $data): bool|string
+    {
+        $param = [];
+        $param['complainted_mchid'] = $data['mchid'];
+        $option = ['type' => 'post', 'returnHttp' => true];
+        $request = $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/complete", $param, $option);
+        $code = (int)$request->info('code');
+        if ($code >= 200 and $code < 300) return true;
+        return $request->error();
+    }
+
+    public function refund(array $data): bool|string
+    {
+        if ($data['action'] === true) $data['action'] = 'APPROVE';
+        if ($data['action'] === false) $data['action'] = 'REJECT';
+        $data['action'] = strtoupper($data['action']);
+        if (!in_array($data['action'], ['APPROVE', 'REJECT'])) return 'action需为REJECT|APPROVE，或true|false';
+
+        $param = [];
+        $param['action'] = $data['action'];//REJECT: 拒绝退款 APPROVE: 同意退款
+        $param['launch_refund_day'] = intval($data['day'] ?? 0);//预计将在多少个工作日内能发起退款
+        $param['reject_reason'] = $data['reason'] ?? '';//在拒绝退款时返回拒绝退款的原因
+        $param['remark'] = $data['remark'] ?? '';//任何需要向微信支付客服反馈的信息
+//        $param['reject_media_list'] = [];
+        if (!$param['launch_refund_day']) unset($param['launch_refund_day']);
+        if (empty($param['reject_reason'])) unset($param['reject_reason']);
+        if (empty($param['remark'])) unset($param['remark']);
+
+        $option = ['type' => 'post', 'returnHttp' => true];
+        $request = $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/update-refund-progress", $param, $option);
+        $code = (int)$request->info('code');
+        if ($code >= 200 and $code < 300) return true;
+        return $request->error();
+    }
+
     public function download(array $data)
     {
         $time = $data['time'] ?? (strtotime('-30 day'));
@@ -46,7 +81,21 @@ class Complaint extends ApiV3Base
 
     public function image(array $data)
     {
+        if (is_string($data['url'])) {
+            return $this->get($data['url'], null, ['type' => 'get']);
+        }
         return $this->get("/v3/merchant-service/images/{$data['media_id']}/", null, ['type' => 'get']);
+    }
+
+    public function upload(array $data)
+    {
+        $post = [];
+        $post['file'] = fread(fopen($data['file'], "rb"), filesize($data['file']));
+        $post['meta'] = [
+            'filename' => \basename($data['file']),
+            'sha256' => hash_file('sha256', $data['file']),
+        ];
+        return $this->post("/v3/merchant-service/images/upload", $post, ['type' => 'upload']);
     }
 
     public function history(array $data)
