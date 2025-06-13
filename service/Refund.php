@@ -34,12 +34,23 @@ class Refund extends ApiV3Base implements RefundFace
         $data['sub_mchid'] = $this->entity->merchant['mchid'];
 
         if (isset($params['waybill']) and !empty($params['waybill'])) {
-            $rest = $this->get("/v3/ecommerce/refunds/id/{$params['waybill']}", $data);
+            $value = $this->get("/v3/ecommerce/refunds/id/{$params['waybill']}", $data);
         } else {
-            $rest = $this->get("/v3/ecommerce/refunds/out-refund-no/{$params['number']}", $data);
+            $value = $this->get("/v3/ecommerce/refunds/out-refund-no/{$params['number']}", $data);
         }
-        if (is_string($rest)) return $rest;
-        return $rest;
+        if (is_string($value)) return $value;
+
+        $params = [];
+        $params['success'] = $value['status'] === 'SUCCESS';
+        $params['waybill'] = $value['refund_id'];
+        $params['pay_waybill'] = $value['transaction_id'];
+        $params['number'] = $value['out_refund_no'];
+        $params['time'] = strtotime($value['success_time']);
+        $params['state'] = strtolower(substr($value['status'], -20));
+        $params['amount'] = intval($value['amount']['refund']);
+//        $params['total'] = intval($value['amount']['total']);
+        $params['desc'] = $value['status'];
+        return $params;
     }
 
 
