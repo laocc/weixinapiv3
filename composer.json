@@ -11,6 +11,7 @@
   "require": {
     "php": ">7.4.0",
     "laocc/http": "*",
+    "wechatpay/wechatpay": "*",
     "ext-openssl": "*",
     "ext-curl": "*",
     "ext-xml": "*",

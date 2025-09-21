@@ -17,6 +17,7 @@ abstract class ApiV3Base extends Library
     protected Crypt $crypt;
     private bool $signCheck = true;
     private bool $returnHttp = false;
+    protected bool $wxPubKey = false;//是否微信公钥模式
 
     /**
      * @param Entity $entity
@@ -25,11 +26,13 @@ abstract class ApiV3Base extends Library
     public function _init(Entity $entity)
     {
         $this->entity = $entity;
+        $this->wxPubKey = $entity->wxPubKey;
     }
 
     public function setService(Entity $entity)
     {
         $this->entity = $entity;
+        $this->wxPubKey = $entity->wxPubKey;
         return $this;
     }
 

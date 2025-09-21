@@ -24,6 +24,14 @@ class Entity
 
     public int $service = 1;//服务商类型，1直连商户，2普通服务商，4电商服务商，32自建支付中心
     public bool $improve = false;//商户性质提升，从二级子商户提升为直接商户
+    public bool $wxPubKey = false;//是否微信公钥模式
+    /**
+     * 如何从平台证书切换成微信支付公钥
+     * https://pay.weixin.qq.com/doc/v3/merchant/4012154180
+     *
+     * 微信支付公钥产品简介及使用说明
+     * https://pay.weixin.qq.com/doc/v3/merchant/4012153196
+     */
 
     public mixed $certEncrypt;
 
@@ -52,7 +60,8 @@ class Entity
         $this->certKey = $conf['certKey'] ?? ($conf['key'] ?? ($conf['v3Key'] ?? ''));
         $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
         $this->publicSerial = $conf['publicSerial'] ?? ($conf['public'] ?? '');
-        $this->improve = ($conf['improve'] ?? false);
+        $this->improve = boolval($conf['improve'] ?? false);
+        $this->wxPubKey = boolval($conf['pubKey'] ?? false);
 
         if (isset($conf['cert'])) {
             if (is_string($conf['cert'])) {
