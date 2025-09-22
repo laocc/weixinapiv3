@@ -6,7 +6,6 @@ namespace laocc\weiPay\merchant;
 use laocc\weiPay\ApiV3Base;
 use laocc\weiPay\library\buildPay;
 use laocc\weiPay\library\PayFace;
-use function esp\helper\str_rand;
 
 class Pay extends ApiV3Base implements PayFace
 {

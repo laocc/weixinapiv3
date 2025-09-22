@@ -180,17 +180,20 @@ abstract class ApiV3Base extends Library
         $json = $request->html();
 
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
-        if (isset($this->wxCert)) {
+        if (isset($this->wxCert) and ($this->wxCert->mode & 1)) {
             $certEncrypt = $this->wxCert->public();
+            $signType = 1;
         } else if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
+            $signType = 2;
         } else {
             $cert = "{$this->entity->publicPath}/{$header['WECHATPAY-SERIAL']}/public.pem";
             $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
+            $signType = 3;
         }
         $signature = \base64_decode($header['WECHATPAY-SIGNATURE']);
         $chk = \openssl_verify($message, $signature, $certEncrypt, 'sha256WithRSAEncryption');
-        if ($chk !== 1) return "Error:请求收到的结果签名验证失败";
+        if ($chk !== 1) return "Error:请求收到的结果签名验证{$signType}失败";
 
         if ($this->returnHttp) return $request;
 
