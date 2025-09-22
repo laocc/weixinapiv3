@@ -12,13 +12,13 @@ class WxCert
     public int $mode = 3;
 
 
-    public function __construct(string $certSerial, string $certPath, string $wxSerial)
+    public function __construct(string $certSerial, string $certPath, string $wxSerial, int $mode = 3)
     {
         $wxPub = openssl_get_publickey(file_get_contents("{$certPath}/{$certSerial}/wxpub.pem"));
         if (!$wxPub) throw new Error("微信公钥错误");
         $this->cert = $wxPub;
         $this->serial = $wxSerial;
-        $this->mode = 2;
+        $this->mode = $mode;
     }
 
 
