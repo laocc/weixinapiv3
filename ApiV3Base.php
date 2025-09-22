@@ -179,8 +179,9 @@ abstract class ApiV3Base extends Library
         $header = $request->header();
         $json = $request->html();
 
+        $isPub = str_starts_with($header['WECHATPAY-SERIAL'], 'PUB_KEY_ID');
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
-        if (isset($this->wxCert) and ($this->wxCert->mode & 1)) {
+        if (isset($this->wxCert) and $isPub) {
             $certEncrypt = $this->wxCert->public();
             $signType = 1;
         } else if (isset($this->crypt)) {
@@ -263,6 +264,7 @@ abstract class ApiV3Base extends Library
             if (!is_readable($cert)) return "微信公钥证书{$serial}不存在";
             $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
         }
+
         $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
         if ($chk !== 1) return "wxAPIv3 Sign Error";
 
