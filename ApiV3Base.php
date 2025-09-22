@@ -254,8 +254,9 @@ abstract class ApiV3Base extends Library
         $sign = getenv('HTTP_WECHATPAY_SIGNATURE');
         $json = file_get_contents('php://input');
 
+        $isPub = str_starts_with($serial, 'PUB_KEY_ID');
         $message = "{$time}\n{$nonce}\n{$json}\n";
-        if (isset($this->wxCert)) {
+        if (isset($this->wxCert) and $isPub) {
             $certEncrypt = $this->wxCert->public();
         } else if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
