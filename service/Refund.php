@@ -32,11 +32,12 @@ class Refund extends ApiV3Base implements RefundFace
     {
         $data = [];
         $data['sub_mchid'] = $this->entity->merchant['mchid'];
+        $option = $params['option'] ?? [];
 
         if (isset($params['waybill']) and !empty($params['waybill'])) {
-            $value = $this->get("/v3/ecommerce/refunds/id/{$params['waybill']}", $data);
+            $value = $this->get("/v3/ecommerce/refunds/id/{$params['waybill']}", $data, $option);
         } else {
-            $value = $this->get("/v3/ecommerce/refunds/out-refund-no/{$params['number']}", $data);
+            $value = $this->get("/v3/ecommerce/refunds/out-refund-no/{$params['number']}", $data, $option);
         }
         if (is_string($value)) return $value;
 
@@ -74,8 +75,9 @@ class Refund extends ApiV3Base implements RefundFace
         $param['amount']['refund'] = $refund['amount'];
         $param['amount']['total'] = $refund['total'];
         $param['amount']['currency'] = 'CNY';
+        $option = $refund['option'] ?? [];
 
-        $data = $this->post("/v3/refund/domestic/refunds", $param);
+        $data = $this->post("/v3/refund/domestic/refunds", $param, $option);
         if (is_string($data)) return $data;
 
         return [
@@ -105,8 +107,8 @@ class Refund extends ApiV3Base implements RefundFace
             $param['real_name'] = '';
         }
 
-
-        $data = $this->post("/v3/refund/domestic/refunds/{$refund['waybill']}/apply-abnormal-refund", $param);
+        $option = $refund['option'] ?? [];
+        $data = $this->post("/v3/refund/domestic/refunds/{$refund['waybill']}/apply-abnormal-refund", $param, $option);
         if (is_string($data)) return $data;
 
         return [

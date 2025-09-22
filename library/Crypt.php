@@ -18,18 +18,8 @@ class Crypt
     private OpenSSLAsymmetricKey $cert;
     private OpenSSLAsymmetricKey $public;
 
-    public function __construct(string $certSerial, string $certPath = null)
+    public function __construct(string $certSerial, string $certPath)
     {
-        if (is_null($certPath)) {
-            $certPath = '';
-            if (defined('_CERT')) {
-                if (is_string(_CERT)) {
-                    $certPath = _CERT;
-                } else {
-                    $certPath = _CERT['public'] ?? '';
-                }
-            }
-        }
         if (!$certPath) throw new Error('未指定证书目录');
         $certPath = rtrim($certPath, '/');
         $this->serial = $certSerial;//证书序列号

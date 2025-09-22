@@ -25,6 +25,10 @@ class Entity
     public int $service = 1;//服务商类型，1直连商户，2普通服务商，4电商服务商，32自建支付中心
     public bool $improve = false;//商户性质提升，从二级子商户提升为直接商户
     public bool $wxPubKey = false;//是否微信公钥模式
+    public WxCert $wxCert;
+
+
+
     /**
      * 如何从平台证书切换成微信支付公钥
      * https://pay.weixin.qq.com/doc/v3/merchant/4012154180
@@ -99,6 +103,14 @@ class Entity
 
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($certFile));
     }
+
+
+    public function setWxCert(WxCert $crypt)
+    {
+        $this->wxCert = $crypt;
+        return $this;
+    }
+
 
     public function __toString()
     {

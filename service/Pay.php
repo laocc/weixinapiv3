@@ -70,7 +70,8 @@ class Pay extends ApiV3Base implements PayFace
             $signAppID = $this->entity->merchant['appid'];
         }
 
-        $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data);
+        $option = $params['option'] ?? [];
+        $unified = $this->post("/v3/pay/partner/transactions/jsapi", $data, $option);
         if (is_string($unified)) return $unified;
 
         return $this->PayCodeJsAPI($unified['prepay_id'], $time, $signAppID);
@@ -123,7 +124,8 @@ class Pay extends ApiV3Base implements PayFace
         $data['amount']['total'] = $params['total'] ?? ($params['amount'] ?? $params['fee']);
         $data['amount']['currency'] = 'CNY';
 
-        $unified = $this->post("/v3/pay/partner/transactions/app", $data);
+        $option = $params['option'] ?? [];
+        $unified = $this->post("/v3/pay/partner/transactions/app", $data, $option);
 
         if (is_string($unified)) return $unified;
 
@@ -144,17 +146,18 @@ class Pay extends ApiV3Base implements PayFace
      */
     public function query(array $params): array|string
     {
-        $param = [];
-        $param['sp_mchid'] = $this->entity->mchID;
-        $param['sub_mchid'] = $this->entity->merchant['mchid'];
+        $post = [];
+        $post['sp_mchid'] = $this->entity->mchID;
+        $post['sub_mchid'] = $this->entity->merchant['mchid'];
         if (empty($params['number'] ?? '') and empty($params['waybill'] ?? '')) {
             return '商户订单号或微信订单号至少要提供一个';
         }
 
+        $option = $params['option'] ?? [];
         if ($params['waybill'] ?? '') {
-            $data = $this->get("/v3/pay/partner/transactions/id/{$params['waybill']}", $param);
+            $data = $this->get("/v3/pay/partner/transactions/id/{$params['waybill']}", $post, $option);
         } else {
-            $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$params['number']}", $param);
+            $data = $this->get("/v3/pay/partner/transactions/out-trade-no/{$params['number']}", $post, $option);
         }
         if (is_string($data)) return $data;
 

@@ -7,6 +7,9 @@ use esp\core\Library;
 use esp\http\Http;
 use laocc\weiPay\library\Crypt;
 use laocc\weiPay\library\Entity;
+use laocc\weiPay\library\WxCert;
+use WeChatPay\Builder;
+use WeChatPay\Crypto\Rsa;
 
 abstract class ApiV3Base extends Library
 {
@@ -15,6 +18,7 @@ abstract class ApiV3Base extends Library
 
     protected Entity $entity;
     protected Crypt $crypt;
+    protected WxCert $wxCert;
     private bool $signCheck = true;
     private bool $returnHttp = false;
     protected bool $wxPubKey = false;//是否微信公钥模式
@@ -27,6 +31,10 @@ abstract class ApiV3Base extends Library
     {
         $this->entity = $entity;
         $this->wxPubKey = $entity->wxPubKey;
+
+        if (isset($entity->wxCert)) {
+            $this->wxCert = $entity->wxCert;
+        }
     }
 
     public function setService(Entity $entity)
@@ -52,6 +60,12 @@ abstract class ApiV3Base extends Library
         return $this;
     }
 
+    public function setWxCert(WxCert $crypt)
+    {
+        $this->wxCert = $crypt;
+        return $this;
+    }
+
     /**
      * @param string $method
      * @param string $uri
@@ -61,6 +75,18 @@ abstract class ApiV3Base extends Library
      */
     protected function sign(string $method, string $uri, string $body = ''): string
     {
+//        $platformCertificateContent = \file_get_contents('file:///path/to/wechatpay/certificate.pem');
+//        $platformPublicKeyInstance = Rsa::from($platformCertificateContent, Rsa::KEY_TYPE_PUBLIC);
+//
+//        $instance = Builder::factory([
+//            'mchid'      => $merchantId,
+//            'serial'     => $merchantCertificateSerial,
+//            'privateKey' => $merchantPrivateKeyInstance,
+//            'certs'      => [
+//                $platformCertificateSerialOrPublicKeyId => $platformPublicKeyInstance,
+//            ],
+//        ]);
+
         $method = strtoupper($method);
         $mchID = $this->entity->mchID;
         $nonce = sha1(uniqid('', true));
@@ -99,10 +125,16 @@ abstract class ApiV3Base extends Library
         if (!isset($option['type'])) $option['type'] = 'post';
         $option['headers'] = [];
 
-        if (isset($this->crypt)) {
+        if (isset($this->wxCert)) {
+//            $data = $this->crypt->encryptArray($data);
+            $option['headers']['Wechatpay-Serial'] = $this->wxCert->serial();
+
+        } else if (isset($this->crypt)) {
             $data = $this->crypt->encryptArray($data);
             $option['headers']['Wechatpay-Serial'] = $this->crypt->serial();
+
         }
+
         $this->debug($data);
         $data = json_encode($data, 256 | 64);
 
@@ -148,7 +180,9 @@ abstract class ApiV3Base extends Library
         $json = $request->html();
 
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
-        if (isset($this->crypt)) {
+        if (isset($this->wxCert)) {
+            $certEncrypt = $this->wxCert->public();
+        } else if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
             $cert = "{$this->entity->publicPath}/{$header['WECHATPAY-SERIAL']}/public.pem";
@@ -217,7 +251,9 @@ abstract class ApiV3Base extends Library
         $json = file_get_contents('php://input');
 
         $message = "{$time}\n{$nonce}\n{$json}\n";
-        if (isset($this->crypt)) {
+        if (isset($this->wxCert)) {
+            $certEncrypt = $this->wxCert->public();
+        } else if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
             $cert = "{$this->entity->publicPath}/{$serial}/public.pem";
