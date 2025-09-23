@@ -24,9 +24,7 @@ class Entity
 
     public int $service = 1;//服务商类型，1直连商户，2普通服务商，4电商服务商，32自建支付中心
     public bool $improve = false;//商户性质提升，从二级子商户提升为直接商户
-    public bool $wxPubKey = false;//是否微信公钥模式
     public WxCert $wxCert;
-
 
 
     /**
@@ -65,7 +63,6 @@ class Entity
         $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
         $this->publicSerial = $conf['publicSerial'] ?? ($conf['public'] ?? '');
         $this->improve = boolval($conf['improve'] ?? false);
-        $this->wxPubKey = boolval($conf['pubKey'] ?? false);
 
         if (isset($conf['cert'])) {
             if (is_string($conf['cert'])) {
@@ -76,12 +73,12 @@ class Entity
                 $publicPath = $conf['cert']['public'] ?? '';
             }
         } else if (defined('_CERT')) {
-            if (is_string(_CERT)) {
-                $privatePath = _CERT;
-                $publicPath = _CERT;
-            } else {
+            if (is_array(_CERT)) {
                 $privatePath = _CERT['private'] ?? '';
                 $publicPath = _CERT['public'] ?? '';
+            } else {
+                $privatePath = _CERT;
+                $publicPath = _CERT;
             }
         } else {
             throw new Error('未指定商户私钥证书目录');
@@ -102,6 +99,9 @@ class Entity
         }
 
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($certFile));
+
+        if (!($conf['pubKey'] ?? 0)) return;
+        $this->wxCert = new WxCert($publicPath, $conf['wxPubKey']);
     }
 
 

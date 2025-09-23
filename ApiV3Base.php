@@ -8,8 +8,6 @@ use esp\http\Http;
 use laocc\weiPay\library\Crypt;
 use laocc\weiPay\library\Entity;
 use laocc\weiPay\library\WxCert;
-use WeChatPay\Builder;
-use WeChatPay\Crypto\Rsa;
 
 abstract class ApiV3Base extends Library
 {
@@ -21,7 +19,6 @@ abstract class ApiV3Base extends Library
     protected WxCert $wxCert;
     private bool $signCheck = true;
     private bool $returnHttp = false;
-    protected bool $wxPubKey = false;//是否微信公钥模式
 
     /**
      * @param Entity $entity
@@ -30,7 +27,6 @@ abstract class ApiV3Base extends Library
     public function _init(Entity $entity)
     {
         $this->entity = $entity;
-        $this->wxPubKey = $entity->wxPubKey;
 
         if (isset($entity->wxCert)) {
             $this->wxCert = $entity->wxCert;
@@ -40,7 +36,6 @@ abstract class ApiV3Base extends Library
     public function setService(Entity $entity)
     {
         $this->entity = $entity;
-        $this->wxPubKey = $entity->wxPubKey;
         return $this;
     }
 
