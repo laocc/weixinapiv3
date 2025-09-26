@@ -28,6 +28,7 @@ class Crypt
         $public = openssl_get_publickey(file_get_contents("{$certPath}/{$certSerial}/public.pem"));
         if (!$cert) throw new Error("商户私钥错误");
         if (!$public) throw new Error("商户公钥错误");
+
         $this->cert = $cert;
         $this->public = $public;
     }

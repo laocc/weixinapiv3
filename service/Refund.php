@@ -66,8 +66,8 @@ class Refund extends ApiV3Base implements RefundFace
     {
         $param = [];
         $param['sub_mchid'] = $refund['mchid'];
-        $param['transaction_id'] = $refund['transaction_id'];
-        $param['out_trade_no'] = $refund['out_trade_no'];
+        $param['transaction_id'] = $refund['transaction_id'] ?? '';
+        $param['out_trade_no'] = $refund['out_trade_no'] ?? '';
         $param['out_refund_no'] = $refund['out_refund_no'];
         $param['reason'] = $refund['reason'];
         $param['notify_url'] = $refund['notify'];
@@ -76,6 +76,12 @@ class Refund extends ApiV3Base implements RefundFace
         $param['amount']['total'] = $refund['total'];
         $param['amount']['currency'] = 'CNY';
         $option = $refund['option'] ?? [];
+
+        if (empty($param['out_trade_no'])) unset($param['out_trade_no']);
+        if (empty($param['transaction_id'])) unset($param['transaction_id']);
+        if (!isset($param['out_trade_no']) and !isset($param['transaction_id'])) {
+            return 'transaction_id out_trade_no 二选一，且必填';
+        }
 
         $data = $this->post("/v3/refund/domestic/refunds", $param, $option);
         if (is_string($data)) return $data;

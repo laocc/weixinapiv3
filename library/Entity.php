@@ -5,6 +5,7 @@ namespace laocc\weiPay\library;
 
 use esp\error\Error;
 use Exception;
+use OpenSSLAsymmetricKey;
 
 /**
  * 服务器，或直连商户，身份构造
@@ -35,7 +36,7 @@ class Entity
      * https://pay.weixin.qq.com/doc/v3/merchant/4012153196
      */
 
-    public mixed $certEncrypt;
+    public OpenSSLAsymmetricKey $certEncrypt;
 
     /**
      * Entity constructor.
@@ -48,6 +49,7 @@ class Entity
 
         $this->appID = $conf['appid'] ?? ($conf['appID'] ?? ($conf['appId'] ?? ''));
         if (!$this->appID) throw new Error("传入数据需要含有微信支付商户appID");
+        $this->improve = boolval($conf['improve'] ?? false);//商户性质提升
 
         if (is_array($conf['merchant'] ?? '')) {
             $this->service = ($conf['ecommerce'] ?? 0) ? 4 : 2;
@@ -62,38 +64,22 @@ class Entity
         $this->certKey = $conf['certKey'] ?? ($conf['key'] ?? ($conf['v3Key'] ?? ''));
         $this->certSerial = $conf['certSerial'] ?? ($conf['serial'] ?? '');
         $this->publicSerial = $conf['publicSerial'] ?? ($conf['public'] ?? '');
-        $this->improve = boolval($conf['improve'] ?? false);
 
         if (isset($conf['cert'])) {
-            if (is_string($conf['cert'])) {
-                $privatePath = $conf['cert'];
-                $publicPath = $conf['cert'];
-            } else {
-                $privatePath = $conf['cert']['private'] ?? '';
-                $publicPath = $conf['cert']['public'] ?? '';
-            }
+            $certPath = $conf['cert'];
         } else if (defined('_CERT')) {
-            if (is_array(_CERT)) {
-                $privatePath = _CERT['private'] ?? '';
-                $publicPath = _CERT['public'] ?? '';
-            } else {
-                $privatePath = _CERT;
-                $publicPath = _CERT;
-            }
+            $certPath = _CERT;
         } else {
-            throw new Error('未指定商户私钥证书目录');
+            throw new Error('未指定证书目录');
         }
 
-        if (!$privatePath) throw new Error('未指定商户私钥证书目录');
-        if (!$publicPath) throw new Error('未指定微信公钥证书目录');
-
-        $privatePath = rtrim($privatePath, '/');
-        $this->publicPath = rtrim($publicPath, '/');
+        $certPath = rtrim($certPath, '/');
+        $this->publicPath = $certPath;
 
         /**
          * 这里用到的密钥是在微信支付后台申请的商户私钥，或服务商私钥
          */
-        $certFile = "{$privatePath}/{$this->certSerial}/apiclient_key.pem";
+        $certFile = "{$certPath}/{$this->certSerial}/apiclient_key.pem";
         if (!is_readable($certFile)) {
             throw new Error("商户证书文件{$certFile}不存在，请检查");
         }
@@ -101,7 +87,7 @@ class Entity
         $this->certEncrypt = \openssl_get_privatekey(\file_get_contents($certFile));
 
         if (!($conf['pubKey'] ?? 0)) return;
-        $this->wxCert = new WxCert($publicPath, $conf['wxPubKey']);
+        $this->wxCert = new WxCert($certPath, $conf['wxPubKey']);
     }
 
 
@@ -118,7 +104,7 @@ class Entity
             'service' => $this->service,
             'mchID' => $this->mchID,
             'appID' => $this->appID,
-            'serial' => $this->certSerial,
+            'private' => $this->certSerial,
             'public' => $this->publicSerial,
         ];
         if (isset($this->merchant)) $value['merchant'] = $this->merchant;

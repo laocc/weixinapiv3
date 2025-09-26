@@ -174,7 +174,9 @@ abstract class ApiV3Base extends Library
         $header = $request->header();
         $json = $request->html();
 
-        $isPub = str_starts_with($header['WECHATPAY-SERIAL'], 'PUB_KEY_ID');
+        $serial = $header['WECHATPAY-SERIAL'];
+        $isPub = str_starts_with($serial, 'PUB_KEY_ID');
+
         $message = "{$header['WECHATPAY-TIMESTAMP']}\n{$header['WECHATPAY-NONCE']}\n{$json}\n";
         if (isset($this->wxCert) and $isPub) {
             $certEncrypt = $this->wxCert->public();
@@ -183,8 +185,7 @@ abstract class ApiV3Base extends Library
             $certEncrypt = $this->crypt->public();
             $signType = 2;
         } else {
-            $cert = "{$this->entity->publicPath}/{$header['WECHATPAY-SERIAL']}/public.pem";
-            $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
+            $certEncrypt = $this->readPublicCert($serial);
             $signType = 3;
         }
         $signature = \base64_decode($header['WECHATPAY-SIGNATURE']);
@@ -194,6 +195,13 @@ abstract class ApiV3Base extends Library
         if ($this->returnHttp) return $request;
 
         return $request->data();
+    }
+
+    private function readPublicCert(string $serial)
+    {
+        $cert = "{$this->entity->publicPath}/{$serial}/public.pem";
+        if (!is_readable($cert)) return "公钥证书{$serial}不存在";
+        return \openssl_get_publickey(file_get_contents($cert));
     }
 
     /**
@@ -256,9 +264,7 @@ abstract class ApiV3Base extends Library
         } else if (isset($this->crypt)) {
             $certEncrypt = $this->crypt->public();
         } else {
-            $cert = "{$this->entity->publicPath}/{$serial}/public.pem";
-            if (!is_readable($cert)) return "微信公钥证书{$serial}不存在";
-            $certEncrypt = \openssl_get_publickey(file_get_contents($cert));
+            $certEncrypt = $this->readPublicCert($serial);
         }
 
         $chk = \openssl_verify($message, \base64_decode($sign), $certEncrypt, 'sha256WithRSAEncryption');
