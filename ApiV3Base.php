@@ -111,11 +111,9 @@ abstract class ApiV3Base extends Library
         $option['headers'] = [];
 
         if (isset($this->wxCert)) {
-//            $data = $this->crypt->encryptArray($data);
             $option['headers']['Wechatpay-Serial'] = $this->wxCert->serial();
 
         } else if (isset($this->crypt)) {
-//            $data = $this->crypt->encryptArray($data);
             $option['headers']['Wechatpay-Serial'] = $this->crypt->serial();
         }
 
