@@ -109,6 +109,16 @@ abstract class ApiV3Base extends Library
         if ($params) $api = $api . '?' . http_build_query($params);
         if (!isset($option['type'])) $option['type'] = 'get';
         $option['headers'] = [];
+
+        if (isset($this->wxCert)) {
+//            $data = $this->crypt->encryptArray($data);
+            $option['headers']['Wechatpay-Serial'] = $this->wxCert->serial();
+
+        } else if (isset($this->crypt)) {
+//            $data = $this->crypt->encryptArray($data);
+            $option['headers']['Wechatpay-Serial'] = $this->crypt->serial();
+        }
+
         $option['headers']['Authorization'] = $this->sign(strtoupper($option['type']), $api);
 
         return $this->requestWx($option, $api);
