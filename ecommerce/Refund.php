@@ -31,6 +31,7 @@ class Refund extends ApiV3Base
 
             } else {
                 $value[$ref['refID']] = [
+                    'success' => 1,
                     'refund_id' => $unified['refund_id'],//微信退款单号
                     'number' => $unified['out_refund_no'],//商户退款单号
                     'time' => strtotime($unified['create_time']),

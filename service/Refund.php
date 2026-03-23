@@ -87,6 +87,7 @@ class Refund extends ApiV3Base implements RefundFace
         if (is_string($data)) return $data;
 
         return [
+            'success' => 1,
             'waybill' => $data['refund_id'],
             'number' => $data['out_refund_no'],
             'time' => strtotime($data['create_time']),
