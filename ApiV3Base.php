@@ -107,7 +107,7 @@ abstract class ApiV3Base extends Library
     protected function get(string $api, array $params = null, array $option = [])
     {
         if ($params) $api = $api . '?' . http_build_query($params);
-        if (!isset($option['type'])) $option['type'] = 'get';
+        if (!isset($option['method'])) $option['method'] = 'get';
         $option['headers'] = [];
 
         if (isset($this->wxCert)) {
@@ -125,7 +125,7 @@ abstract class ApiV3Base extends Library
 
     protected function post(string $api, array $data, array $option = [])
     {
-        if (!isset($option['type'])) $option['type'] = 'post';
+        if (!isset($option['method'])) $option['method'] = 'post';
         $option['headers'] = [];
 
         if (isset($this->wxCert)) {
@@ -148,7 +148,7 @@ abstract class ApiV3Base extends Library
 
     protected function requestWx(array $option, string $api, string $data = null)
     {
-        if (!isset($option['type'])) $option['type'] = 'post';
+        if (!isset($option['method'])) $option['method'] = 'post';
         if (!isset($option['encode'])) $option['encode'] = 'json';
         if (!isset($option['decode'])) $option['decode'] = 'json';
         $option['agent'] = 'laocc/esp HttpClient/cURL';
@@ -156,8 +156,8 @@ abstract class ApiV3Base extends Library
         $option['allow'] = [200, 204];
         $option['headers']['Accept'] = "application/json";
         $option['headers']['Accept-Language'] = 'zh-CN';
-        if ($option['type'] === 'upload') {
-            $option['type'] = 'post';
+        if ($option['method'] === 'upload') {
+            $option['method'] = 'post';
             $option['headers']['Content-Type'] = "multipart/form-data";
         } else {
             $option['headers']['Content-Type'] = "application/json";

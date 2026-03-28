@@ -18,7 +18,7 @@ class Complaint extends ApiV3Base
         $param['complainted_mchid'] = $data['mchid'];
         $param['response_content'] = $data['content'];
 //        $param['response_images'] = [];
-        $option = ['type' => 'post', 'returnHttp' => true];
+        $option = ['method' => 'post', 'returnHttp' => true];
         $request = $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/response", $param, $option);
         $code = (int)$request->info('code');
         if ($code >= 200 and $code < 300) return true;
@@ -29,7 +29,7 @@ class Complaint extends ApiV3Base
     {
         $param = [];
         $param['complainted_mchid'] = $data['mchid'];
-        $option = ['type' => 'post', 'returnHttp' => true];
+        $option = ['method' => 'post', 'returnHttp' => true];
         $request = $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/complete", $param, $option);
         $code = (int)$request->info('code');
         if ($code >= 200 and $code < 300) return true;
@@ -53,7 +53,7 @@ class Complaint extends ApiV3Base
         if (empty($param['reject_reason'])) unset($param['reject_reason']);
         if (empty($param['remark'])) unset($param['remark']);
 
-        $option = ['type' => 'post', 'returnHttp' => true];
+        $option = ['method' => 'post', 'returnHttp' => true];
         $request = $this->post("/v3/merchant-service/complaints-v2/{$data['complaint_id']}/update-refund-progress", $param, $option);
         $code = (int)$request->info('code');
         if ($code >= 200 and $code < 300) return true;
@@ -71,17 +71,17 @@ class Complaint extends ApiV3Base
         $param['begin_date'] = $begin;
         $param['end_date'] = $end;
         if (isset($data['mchid'])) $param['complainted_mchid'] = $data['mchid'];
-        return $this->get("/v3/merchant-service/complaints-v2", $param, ['type' => 'get']);
+        return $this->get("/v3/merchant-service/complaints-v2", $param, ['method' => 'get']);
     }
 
     public function read(array $data)
     {
-        return $this->get("/v3/merchant-service/complaints-v2/{$data['id']}/", null, ['type' => 'get']);
+        return $this->get("/v3/merchant-service/complaints-v2/{$data['id']}/", null, ['method' => 'get']);
     }
 
     public function image(array $data): array|string
     {
-        $option = ['type' => 'get', 'returnHttp' => 1];
+        $option = ['method' => 'get', 'returnHttp' => 1];
         $image = $this->get("/v3/merchant-service/images/" . urlencode($data['media_id']), null, $option);
         return ['src' => 'data:image/png;base64,' . base64_encode($image->html())];
     }
@@ -94,7 +94,7 @@ class Complaint extends ApiV3Base
             'filename' => \basename($data['file']),
             'sha256' => hash_file('sha256', $data['file']),
         ];
-        return $this->post("/v3/merchant-service/images/upload", $post, ['type' => 'upload']);
+        return $this->post("/v3/merchant-service/images/upload", $post, ['method' => 'upload']);
     }
 
     public function history(array $data)
@@ -102,7 +102,7 @@ class Complaint extends ApiV3Base
         $param = [];
         $param['limit'] = 300;
         $param['offset'] = 0;
-        return $this->get("/v3/merchant-service/complaints-v2/{$data['id']}/negotiation-historys", $param, ['type' => 'get']);
+        return $this->get("/v3/merchant-service/complaints-v2/{$data['id']}/negotiation-historys", $param, ['method' => 'get']);
     }
 
 
@@ -124,15 +124,15 @@ class Complaint extends ApiV3Base
             case 'set':
                 $param = [];
                 $param['url'] = $url;
-                $data = $this->post($comApi, $param, ['type' => 'post']);
+                $data = $this->post($comApi, $param, ['method' => 'post']);
                 break;
             case 'update':
                 $param = [];
                 $param['url'] = $url;
-                $data = $this->post($comApi, $param, ['type' => 'put']);
+                $data = $this->post($comApi, $param, ['method' => 'put']);
                 break;
             case 'delete':
-                $data = $this->get($comApi, null, ['type' => 'delete']);
+                $data = $this->get($comApi, null, ['method' => 'delete']);
                 break;
             default:
                 return '';
