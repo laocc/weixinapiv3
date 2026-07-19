@@ -70,18 +70,6 @@ abstract class ApiV3Base extends Library
      */
     protected function sign(string $method, string $uri, string $body = ''): string
     {
-//        $platformCertificateContent = \file_get_contents('file:///path/to/wechatpay/certificate.pem');
-//        $platformPublicKeyInstance = Rsa::from($platformCertificateContent, Rsa::KEY_TYPE_PUBLIC);
-//
-//        $instance = Builder::factory([
-//            'mchid'      => $merchantId,
-//            'serial'     => $merchantCertificateSerial,
-//            'privateKey' => $merchantPrivateKeyInstance,
-//            'certs'      => [
-//                $platformCertificateSerialOrPublicKeyId => $platformPublicKeyInstance,
-//            ],
-//        ]);
-
         $method = strtoupper($method);
         $mchID = $this->entity->mchID;
         $nonce = sha1(uniqid('', true));
@@ -117,7 +105,7 @@ abstract class ApiV3Base extends Library
             $option['headers']['Wechatpay-Serial'] = $this->crypt->serial();
         }
 
-        $option['headers']['Authorization'] = $this->sign(strtoupper($option['type']), $api);
+        $option['headers']['Authorization'] = $this->sign(strtoupper($option['method']), $api);
 
         return $this->requestWx($option, $api);
     }
@@ -141,7 +129,7 @@ abstract class ApiV3Base extends Library
         $this->debug($data);
         $data = json_encode($data, 256 | 64);
 
-        $option['headers']['Authorization'] = $this->sign(strtoupper($option['type']), $api, $data);
+        $option['headers']['Authorization'] = $this->sign(strtoupper($option['method']), $api, $data);
 
         return $this->requestWx($option, $api, $data);
     }
@@ -151,8 +139,8 @@ abstract class ApiV3Base extends Library
         if (!isset($option['method'])) $option['method'] = 'post';
         if (!isset($option['encode'])) $option['encode'] = 'json';
         if (!isset($option['decode'])) $option['decode'] = 'json';
-        $option['agent'] = 'laocc/esp HttpClient/cURL';
         $option['header'] = true;
+        $option['agent'] = 'laocc/esp HttpClient/cURL';
         $option['allow'] = [200, 204];
         $option['headers']['Accept'] = "application/json";
         $option['headers']['Accept-Language'] = 'zh-CN';
